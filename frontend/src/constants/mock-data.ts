@@ -116,48 +116,6 @@ export const MOCK_TEST_DETAILS = {
 };
 
 // ==========================================
-// 4. DỮ LIỆU LỘ TRÌNH ĐIỀU TRỊ (Roadmap)
-// ==========================================
-export const MOCK_ROADMAP = [
-  {
-    week: 1,
-    title: 'Tuần 1: Nhận thức cảm xúc',
-    status: 'completed',
-    tasks: [
-      'Ghi nhật ký cảm xúc 3 ngày liên tiếp',
-      'Thực hành hít thở sâu 5 phút mỗi tối'
-    ]
-  },
-  {
-    week: 2,
-    title: 'Tuần 2: Quản lý căng thẳng',
-    status: 'in-progress',
-    tasks: [
-      'Nghe nhạc thiền 15 phút',
-      'Tập thể dục nhẹ nhàng (Yoga/Đi bộ) 2 lần'
-    ]
-  },
-  {
-    week: 3,
-    title: 'Tuần 3: Thay đổi tư duy',
-    status: 'locked',
-    tasks: [
-      'Đọc bài viết về tư duy tích cực',
-      'Viết ra 3 điều biết ơn mỗi ngày'
-    ]
-  },
-  {
-    week: 4,
-    title: 'Tuần 4: Duy trì thói quen',
-    status: 'locked',
-    tasks: [
-      'Làm lại bài Test đánh giá để so sánh',
-      'Lập kế hoạch sinh hoạt tuần tới'
-    ]
-  }
-];
-
-// ==========================================
 // 5. DỮ LIỆU THỐNG KÊ (Biểu đồ)
 // ==========================================
 // Dữ liệu cho react-native-gifted-charts (Biểu đồ đường)
