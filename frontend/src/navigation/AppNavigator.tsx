@@ -12,6 +12,7 @@ import TestsScreen from '../screens/tests/TestsScreen';
 import ProfileScreen from '../screens/profile/ProfileScreen';
 import PersonalInfoScreen from '../screens/profile/PersonalInfoScreen';
 import RoadmapScreen from '../screens/roadmap/RoadmapScreen';
+import DiaryScreen from '../screens/diaries/DiaryScreen';
 
 const Tab = createBottomTabNavigator<AppTabParamList>();
 const Stack = createNativeStackNavigator<AppStackParamList>();
@@ -71,15 +72,14 @@ const TmpScreen = ({ name }: { name: string }) => (
   <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text>{name} Screen</Text></View>
 );
 
-const DiariesScreen = () => <TmpScreen name="Nhật ký" />;
-// Roadmap52HzScreen is now a real screen
+// DiariesScreen and RoadmapScreen are now real screens
 // ----------------------------------------------------
 
 // Wrap tất cả các màn hình với hiệu ứng slide
 const AnimatedHome = withTabTransition(HomeScreen);
 const AnimatedTests = withTabTransition(TestsScreen);
 const AnimatedRoadmap = withTabTransition(RoadmapScreen);
-const AnimatedDiaries = withTabTransition(DiariesScreen);
+const AnimatedDiaries = withTabTransition(DiaryScreen);
 const AnimatedProfile = withTabTransition(ProfileScreen);
 const AnimatedPersonalInfo = withTabTransition(PersonalInfoScreen);
 
