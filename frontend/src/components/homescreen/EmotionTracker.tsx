@@ -3,14 +3,9 @@ import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 
 const mintColor = '#4ABEB2';
 
-export const EMOTIONS = [
-  { id: 'tired', name: 'Mệt mỏi', icon: require('../../../assets/images/emotions/tired.png') },
-  { id: 'angry', name: 'Tức giận', icon: require('../../../assets/images/emotions/angry.png') },
-  { id: 'surprise', name: 'Ngạc nhiên', icon: require('../../../assets/images/emotions/surspise.png') },
-  { id: 'happy', name: 'Hạnh phúc', icon: require('../../../assets/images/emotions/happy.png') },
-  { id: 'empty', name: 'Trống rỗng', icon: require('../../../assets/images/emotions/empty.png') },
-  { id: 'sad', name: 'Buồn', icon: require('../../../assets/images/emotions/sad.png') },
-];
+import { MOCK_EMOTIONS } from '../../constants/mock-data';
+
+export const EMOTIONS = MOCK_EMOTIONS;
 
 interface EmotionTrackerProps {
   onSelectEmotion: (emotion: any) => void;

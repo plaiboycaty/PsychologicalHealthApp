@@ -29,20 +29,20 @@ export const MOCK_ONBOARDING = [
 // 2. DỮ LIỆU NHẬT KÝ & CẢM XÚC (Diaries)
 // ==========================================
 export const MOCK_EMOTIONS = [
-  { id: 1, name: 'Mệt mỏi', icon: require('../../assets/images/emotions/tired.png'), color: '#27AE60' },
-  { id: 2, name: 'Tức giận', icon: require('../../assets/images/emotions/angry.png'), color: '#2F80ED' },
+  { id: 1, name: 'Mệt mỏi', icon: require('../../assets/images/emotions/tired.png'), color: '#aeaefcff' },
+  { id: 2, name: 'Tức giận', icon: require('../../assets/images/emotions/angry.png'), color: '#EB5757' },
   { id: 3, name: 'Ngạc nhiên', icon: require('../../assets/images/emotions/surspise.png'), color: '#F2C94C' },
-  { id: 4, name: 'Hạnh phúc', icon: require('../../assets/images/emotions/happy.png'), color: '#828282' },
-  { id: 5, name: 'Trống rỗng', icon: require('../../assets/images/emotions/empty.png'), color: '#EB5757' },
-  { id: 6, name: 'Buồn bã', icon: require('../../assets/images/emotions/sad.png'), color: '#88D498' },
+  { id: 4, name: 'Hạnh phúc', icon: require('../../assets/images/emotions/happy.png'), color: '#27AE60' },
+  { id: 5, name: 'Trống rỗng', icon: require('../../assets/images/emotions/empty.png'), color: '#5F5F5F' },
+  { id: 6, name: 'Buồn bã', icon: require('../../assets/images/emotions/sad.png'), color: '#2F80ED' },
 ];
 
 export const MOCK_DIARIES = [
   {
-    id: 1,
+    id: 4,
     title: 'Một ngày năng suất',
     content: 'Hôm nay mình đã hoàn thành được 3 task lớn, cảm thấy rất vui và nhẹ nhõm. Hy vọng ngày mai cũng sẽ như vậy.',
-    emotion_id: 1,
+    emotion_id: 4,
     emotion_name: 'Hạnh phúc',
     image_url: 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=500&q=60',
     created_at: '2026-05-18T10:00:00Z',
@@ -52,7 +52,7 @@ export const MOCK_DIARIES = [
     title: 'Áp lực công việc',
     content: 'Deadline sắp đến gần làm mình không thể tập trung. Cảm thấy đau đầu và hơi khó thở.',
     emotion_id: 5,
-    emotion_name: 'Tức giận',
+    emotion_name: 'Trống rỗng',
     image_url: null,
     created_at: '2026-05-19T15:30:00Z',
   }

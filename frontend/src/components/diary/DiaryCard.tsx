@@ -17,7 +17,7 @@ export type DiaryEntry = {
 
 interface DiaryCardProps {
   item: DiaryEntry;
-  onMore: (id: number) => void;
+  onPress: (item: DiaryEntry) => void;
 }
 
 function formatTime(isoString: string): string {
@@ -27,7 +27,7 @@ function formatTime(isoString: string): string {
   return `${h}:${m}`;
 }
 
-export default function DiaryCard({ item, onMore }: DiaryCardProps) {
+export default function DiaryCard({ item, onPress }: DiaryCardProps) {
   const emotion = MOCK_EMOTIONS.find(e => e.id === item.emotion_id);
   const emotionColor = emotion?.color ?? '#BDBDBD';
   const emotionIcon = emotion?.icon;
@@ -48,7 +48,11 @@ export default function DiaryCard({ item, onMore }: DiaryCardProps) {
   };
 
   return (
-    <View style={styles.card}>
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() => onPress(item)}
+      activeOpacity={0.85}
+    >
       {/* Dải màu cảm xúc bên trái */}
       <View style={[styles.emotionBar, { backgroundColor: emotionColor }]} />
 
@@ -76,16 +80,7 @@ export default function DiaryCard({ item, onMore }: DiaryCardProps) {
           </Text>
         </View>
       </View>
-
-      {/* Nút 3 chấm */}
-      <TouchableOpacity
-        style={styles.moreBtn}
-        onPress={() => onMore(item.id)}
-        hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-      >
-        <Feather name="more-horizontal" size={20} color="#BDBDBD" />
-      </TouchableOpacity>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -142,7 +137,7 @@ const styles = StyleSheet.create({
   contentCol: {
     flex: 1,
     paddingVertical: 14,
-    paddingRight: 36, // Space cho nút 3 chấm
+    paddingRight: 16, // Đổi từ 36 thành 16 vì không cần không gian cho nút 3 chấm nữa
   },
   titleText: {
     fontSize: 15,
@@ -174,10 +169,5 @@ const styles = StyleSheet.create({
   emotionTagText: {
     fontSize: 11,
     fontFamily: 'Baloo2_700Bold',
-  },
-  moreBtn: {
-    position: 'absolute',
-    top: 12,
-    right: 10,
   },
 });

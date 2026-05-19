@@ -1,13 +1,21 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { EMOTIONS } from './EmotionTracker';
+import { DiaryEntry } from '../../components/diary/DiaryCard';
+import { MOCK_EMOTIONS } from '../../constants/mock-data';
 
 interface WeeklyCalendarProps {
-  todayEmotion?: any;
+  diaries: DiaryEntry[];
 }
 
-export default function WeeklyCalendar({ todayEmotion }: WeeklyCalendarProps) {
+function toLocalDateStr(date: Date): string {
+  const y = date.getFullYear();
+  const m = (date.getMonth() + 1).toString().padStart(2, '0');
+  const d = date.getDate().toString().padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+export default function WeeklyCalendar({ diaries }: WeeklyCalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
 
   const { weekDates, monthTitle } = useMemo(() => {
@@ -20,16 +28,16 @@ export default function WeeklyCalendar({ todayEmotion }: WeeklyCalendarProps) {
       const isToday = date.toDateString() === new Date().toDateString();
       const isFuture = date.getTime() > new Date().getTime() && !isToday;
       
+      const dateStr = toLocalDateStr(date);
+      const entryForDate = diaries.find(d => d.created_at.startsWith(dateStr));
+      const matchedEmotion = entryForDate ? MOCK_EMOTIONS.find(e => e.id === entryForDate.emotion_id) : null;
+
       week.push({
         dateNum: date.getDate(),
         isToday,
         isFuture,
-        // Nếu là hôm nay thì lấy icon từ prop todayEmotion, nếu là quá khứ thì random
-        mockEmotion: isToday
-          ? (todayEmotion ? todayEmotion.icon : null)
-          : (!isFuture && Math.random() > 0.3) 
-            ? EMOTIONS[Math.floor(Math.random() * EMOTIONS.length)].icon 
-            : null
+        // Sử dụng icon cảm xúc thật từ nhật ký
+        realEmotion: matchedEmotion ? matchedEmotion.icon : null
       });
     }
 
@@ -40,7 +48,7 @@ export default function WeeklyCalendar({ todayEmotion }: WeeklyCalendarProps) {
       weekDates: week,
       monthTitle: `${monthEng} - Tháng ${monthVN}`
     };
-  }, [currentDate, todayEmotion]);
+  }, [currentDate, diaries]);
 
   const handlePrevWeek = () => {
     setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth(), prev.getDate() - 7));
@@ -80,8 +88,8 @@ export default function WeeklyCalendar({ todayEmotion }: WeeklyCalendarProps) {
             {dayObj.isFuture ? (
               <View style={styles.emptyIconCircle} />
             ) : (
-              dayObj.mockEmotion ? (
-                <Image source={dayObj.mockEmotion} style={styles.historyIcon} />
+              dayObj.realEmotion ? (
+                <Image source={dayObj.realEmotion} style={styles.historyIcon} />
               ) : (
                 <View style={styles.emptyIconCircle} />
               )

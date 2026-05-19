@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,20 +6,30 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 
 import { MOCK_DIARIES } from '../../constants/mock-data';
 import DiaryCard, { DiaryEntry } from '../../components/diary/DiaryCard';
 import DatePicker from '../../components/diary/DatePicker';
+import CalendarFilterModal from '../../components/diary/CalendarFilterModal';
+import DiaryDetailModal from '../../components/diary/DiaryDetailModal';
+import DiaryEditorModal from '../../components/diary/DiaryEditorModal';
 
 const MINT_COLOR = '#4ABEB2';
 const BG_COLOR = '#FFF8F0';
+const STORAGE_KEY = '@diaries_data_key';
 
-// Lấy ngày hôm nay dạng 'YYYY-MM-DD'
+// Lấy ngày hôm nay dạng 'YYYY-MM-DD' (sử dụng giờ địa phương thay vì UTC để tránh lệch ngày)
 function toDateStr(date: Date): string {
-  return date.toISOString().split('T')[0];
+  const y = date.getFullYear();
+  const m = (date.getMonth() + 1).toString().padStart(2, '0');
+  const d = date.getDate().toString().padStart(2, '0');
+  return `${y}-${m}-${d}`;
 }
 
 // Lấy ngày từ ISO string diary
@@ -29,34 +39,142 @@ function getEntryDate(isoStr: string): string {
 
 export default function DiaryScreen() {
   const [selectedDate, setSelectedDate] = useState<string>(toDateStr(new Date()));
-  const [diaries, setDiaries] = useState<DiaryEntry[]>(MOCK_DIARIES);
+  const [diaries, setDiaries] = useState<DiaryEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isCalendarVisible, setIsCalendarVisible] = useState(false);
+
+  // States cho các Modals chi tiết & thêm/sửa
+  const [selectedDetailEntry, setSelectedDetailEntry] = useState<DiaryEntry | null>(null);
+  const [isDetailVisible, setIsDetailVisible] = useState(false);
+
+  const [selectedEditorEntry, setSelectedEditorEntry] = useState<DiaryEntry | null>(null);
+  const [isEditorVisible, setIsEditorVisible] = useState(false);
+
+  // ---- Đọc dữ liệu từ AsyncStorage khi màn hình nhận focus ----
+  useFocusEffect(
+    useCallback(() => {
+      const loadDiaries = async () => {
+        try {
+          const stored = await AsyncStorage.getItem(STORAGE_KEY);
+          if (stored !== null) {
+            setDiaries(JSON.parse(stored));
+          } else {
+            // Lần đầu chưa có gì, dùng mock data
+            setDiaries(MOCK_DIARIES);
+            await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(MOCK_DIARIES));
+          }
+        } catch (e) {
+          console.warn('Failed to load diaries from AsyncStorage', e);
+        } finally {
+          setLoading(false);
+        }
+      };
+      loadDiaries();
+    }, [])
+  );
+
+  // ---- Lưu dữ liệu xuống AsyncStorage bất cứ khi nào mảng diaries đổi ----
+  const saveDiariesToStorage = async (updatedList: DiaryEntry[]) => {
+    try {
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedList));
+    } catch (e) {
+      console.warn('Failed to save diaries to AsyncStorage', e);
+    }
+  };
 
   // Lọc nhật ký theo ngày đang chọn
   const filteredDiaries = diaries.filter(
     d => getEntryDate(d.created_at) === selectedDate
   );
 
-  // Xử lý nhấn nút "..." trên card
-  const handleMorePress = useCallback((id: number) => {
-    Alert.alert('Tuỳ chọn', '', [
-      {
-        text: '✏️  Sửa nhật ký',
-        onPress: () => console.log('Edit', id),
-      },
-      {
-        text: '🗑️  Xoá nhật ký',
-        style: 'destructive',
-        onPress: () => {
-          setDiaries(prev => prev.filter(d => d.id !== id));
+  // Xử lý Xoá Nhật Ký (kèm Alert hỏi xác nhận)
+  const handleDeleteDiary = useCallback((id: number) => {
+    Alert.alert(
+      'Xác nhận xoá',
+      'Cậu có chắc chắn muốn xoá nhật ký này không? Hành động này không thể hoàn tác.',
+      [
+        { text: 'Huỷ', style: 'cancel' },
+        {
+          text: 'Xoá',
+          style: 'destructive',
+          onPress: () => {
+            setDiaries(prev => {
+              const nextList = prev.filter(d => d.id !== id);
+              saveDiariesToStorage(nextList);
+              return nextList;
+            });
+            setIsDetailVisible(false);
+            setSelectedDetailEntry(null);
+          },
         },
-      },
-      { text: 'Huỷ', style: 'cancel' },
-    ]);
+      ]
+    );
   }, []);
 
+  // Xử lý khi nhấn vào xem chi tiết card
+  const handleCardPress = (entry: DiaryEntry) => {
+    setSelectedDetailEntry(entry);
+    setIsDetailVisible(true);
+  };
+
+  // Mở modal thêm nhật ký mới
   const handleAddNew = () => {
-    // TODO: Mở màn hình/modal thêm nhật ký
-    Alert.alert('Thêm nhật ký', 'Tính năng đang được phát triển.');
+    setSelectedEditorEntry(null);
+    setIsEditorVisible(true);
+  };
+
+  // Xử lý Lưu Thêm mới / Chỉnh sửa
+  const handleSaveEntry = (entryData: {
+    title: string;
+    content: string;
+    emotion_id: number;
+    emotion_name: string;
+    image_url: string | null;
+  }) => {
+    if (selectedEditorEntry) {
+      // Đang SỬA nhật ký
+      setDiaries(prev => {
+        const nextList = prev.map(item => {
+          if (item.id === selectedEditorEntry.id) {
+            return {
+              ...item,
+              ...entryData,
+            };
+          }
+          return item;
+        });
+        saveDiariesToStorage(nextList);
+        return nextList;
+      });
+      setIsEditorVisible(false);
+      setSelectedEditorEntry(null);
+      // Nếu đang mở xem chi tiết của entry này thì đóng lại luôn để reload thông tin mới
+      setIsDetailVisible(false);
+      setSelectedDetailEntry(null);
+    } else {
+      // Đang THÊM MỚI nhật ký
+      const now = new Date();
+      const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+      // Gán nhật ký vào đúng ngày đang được chọn trên DatePicker
+      const created_at = `${selectedDate}T${timeStr}Z`;
+
+      const newEntry: DiaryEntry = {
+        id: Date.now(), // tạo ID duy nhất dựa trên timestamp
+        title: entryData.title,
+        content: entryData.content,
+        emotion_id: entryData.emotion_id,
+        emotion_name: entryData.emotion_name,
+        image_url: entryData.image_url,
+        created_at,
+      };
+
+      setDiaries(prev => {
+        const nextList = [newEntry, ...prev];
+        saveDiariesToStorage(nextList);
+        return nextList;
+      });
+      setIsEditorVisible(false);
+    }
   };
 
   const renderEmpty = () => (
@@ -75,46 +193,92 @@ export default function DiaryScreen() {
         <Text style={styles.question}>Ngày hôm nay của cậu,{'\n'}có ổn không?</Text>
       </View>
 
-      {/* ---- Nhãn tháng (Đưa lên trên DatePicker để đúng logic thời gian) ---- */}
-      <View style={styles.monthRow}>
-        <Text style={styles.monthLabel}>
-          {new Date(selectedDate + 'T00:00:00').toLocaleDateString('vi-VN', {
-            month: 'long',
-            year: 'numeric',
-          })}
-        </Text>
-        <Text style={styles.countLabel}>
-          {filteredDiaries.length > 0 ? `${filteredDiaries.length} ghi chú` : ''}
-        </Text>
-      </View>
-
       {/* ---- DatePicker ---- */}
       <View style={styles.datePickerWrapper}>
         <DatePicker
           selectedDate={selectedDate}
           onSelectDate={setSelectedDate}
+          onOpenCalendar={() => setIsCalendarVisible(true)}
         />
       </View>
 
-      {/* ---- Danh sách nhật ký ---- */}
-      <FlatList
-        data={filteredDiaries}
-        keyExtractor={item => item.id.toString()}
-        renderItem={({ item }) => (
-          <DiaryCard item={item} onMore={handleMorePress} />
-        )}
-        ListEmptyComponent={renderEmpty}
-        contentContainerStyle={[
-          styles.listContent,
-          filteredDiaries.length === 0 && styles.listContentEmpty,
-        ]}
-        showsVerticalScrollIndicator={false}
+      <CalendarFilterModal
+        visible={isCalendarVisible}
+        onClose={() => setIsCalendarVisible(false)}
+        currentSelectedDate={selectedDate}
+        onSelectDate={(dateStr) => {
+          setSelectedDate(dateStr);
+        }}
       />
+
+      <Text style={styles.countLabel}>
+        {filteredDiaries.length > 0 ? `${filteredDiaries.length} ghi chú` : ''}
+      </Text>
+
+      {/* ---- Loading Indicator ---- */}
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={MINT_COLOR} />
+        </View>
+      ) : (
+        /* ---- Danh sách nhật ký ---- */
+        <FlatList
+          data={filteredDiaries}
+          keyExtractor={item => item.id.toString()}
+          renderItem={({ item }) => (
+            <DiaryCard
+              item={item}
+              onPress={handleCardPress}
+            />
+          )}
+          ListEmptyComponent={renderEmpty}
+          contentContainerStyle={[
+            styles.listContent,
+            filteredDiaries.length === 0 && styles.listContentEmpty,
+          ]}
+          showsVerticalScrollIndicator={false}
+        />
+      )}
 
       {/* ---- Floating Action Button ---- */}
       <TouchableOpacity style={styles.fab} onPress={handleAddNew} activeOpacity={0.85}>
         <Feather name="plus" size={28} color="#FFFFFF" />
       </TouchableOpacity>
+
+      {/* ---- Modal Xem Chi Tiết Nhật Ký ---- */}
+      {isDetailVisible && (
+        <DiaryDetailModal
+          visible={isDetailVisible}
+          item={selectedDetailEntry}
+          onClose={() => {
+            setIsDetailVisible(false);
+            setSelectedDetailEntry(null);
+          }}
+          onEdit={(entry) => {
+            // Đóng modal chi tiết trước để tránh xung đột animation khi mở đè 2 modal
+            setIsDetailVisible(false);
+            setSelectedDetailEntry(null);
+            setTimeout(() => {
+              setSelectedEditorEntry(entry);
+              setIsEditorVisible(true);
+            }, 300);
+          }}
+          onDelete={handleDeleteDiary}
+        />
+      )}
+
+      {/* ---- Modal Thêm mới / Chỉnh sửa Nhật Ký ---- */}
+      {isEditorVisible && (
+        <DiaryEditorModal
+          visible={isEditorVisible}
+          item={selectedEditorEntry}
+          onClose={() => {
+            setIsEditorVisible(false);
+            setSelectedEditorEntry(null);
+          }}
+          onSave={handleSaveEntry}
+        />
+      )}
     </SafeAreaView>
   );
 }
@@ -124,12 +288,17 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: BG_COLOR,
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 
   // ----- Header -----
   header: {
     paddingHorizontal: 24,
     paddingTop: 12,
-    paddingBottom: 8, // Giảm bớt để không đẩy phần thời gian xuống quá sâu
+    paddingBottom: 8,
   },
   greeting: {
     fontSize: 18,
@@ -160,6 +329,8 @@ const styles = StyleSheet.create({
     textTransform: 'capitalize',
   },
   countLabel: {
+    textAlign: 'right',
+    marginRight: 24,
     fontSize: 14,
     color: MINT_COLOR,
     fontFamily: 'Baloo2_400Regular',
@@ -174,8 +345,8 @@ const styles = StyleSheet.create({
   // ----- List -----
   listContent: {
     paddingHorizontal: 20,
-    paddingTop: 8, // Thêm padding top để Card đầu tiên không bị dính sát vào DatePicker
-    paddingBottom: 120, // An toàn với FAB + tab bar
+    paddingTop: 8,
+    paddingBottom: 120,
   },
   listContentEmpty: {
     flex: 1,
@@ -211,19 +382,17 @@ const styles = StyleSheet.create({
   fab: {
     position: 'absolute',
     right: 24,
-    bottom: 110, // Cách tab bar an toàn
+    bottom: 110,
     width: 60,
     height: 60,
     borderRadius: 30,
     backgroundColor: MINT_COLOR,
     justifyContent: 'center',
     alignItems: 'center',
-    // Shadow iOS
     shadowColor: '#2D9E98',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.35,
     shadowRadius: 10,
-    // Android
     elevation: 10,
   },
 });

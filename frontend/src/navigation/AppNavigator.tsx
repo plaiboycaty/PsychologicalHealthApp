@@ -65,15 +65,6 @@ function withTabTransition<T extends object>(WrappedComponent: React.ComponentTy
     );
   };
 }
-// --------------------------------------------------
-
-// --- UI Tạm thời---
-const TmpScreen = ({ name }: { name: string }) => (
-  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text>{name} Screen</Text></View>
-);
-
-// DiariesScreen and RoadmapScreen are now real screens
-// ----------------------------------------------------
 
 // Wrap tất cả các màn hình với hiệu ứng slide
 const AnimatedHome = withTabTransition(HomeScreen);

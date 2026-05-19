@@ -17,7 +17,7 @@ const mintColor = '#66C5BA';
 
 interface EmotionModalProps {
   visible: boolean;
-  emotion: { id: string; name: string; icon: any } | null;
+  emotion: { id: number | string; name: string; icon: any } | null;
   onClose: () => void;
   onSubmit: (reason: string) => void;
 }

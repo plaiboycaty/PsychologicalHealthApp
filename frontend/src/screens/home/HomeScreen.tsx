@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,10 +8,14 @@ import {
   Image,
   ImageBackground,
   Dimensions,
-  Platform
+  Platform,
+  Alert
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
+import { MOCK_DIARIES } from '../../constants/mock-data';
 import EmotionModal from '../../components/homescreen/EmotionModal';
 import EmotionTracker from '../../components/homescreen/EmotionTracker';
 import WeeklyCalendar from '../../components/homescreen/WeeklyCalendar';
@@ -23,20 +27,66 @@ const mintColor = '#4ABEB2';
 export default function HomeScreen() {
   const [selectedEmotion, setSelectedEmotion] = useState<any>(null);
   const [isModalVisible, setModalVisible] = useState(false);
-  
-  // State lưu trữ cảm xúc đã gửi trong ngày hôm nay để hiển thị lên Lịch
-  const [todayEmotion, setTodayEmotion] = useState<any>(null);
+  const [diaries, setDiaries] = useState<any[]>([]);
+
+  // Đọc danh sách nhật ký từ AsyncStorage mỗi khi HomeScreen được focus
+  useFocusEffect(
+    useCallback(() => {
+      const loadDiaries = async () => {
+        try {
+          const stored = await AsyncStorage.getItem('@diaries_data_key');
+          if (stored !== null) {
+            setDiaries(JSON.parse(stored));
+          } else {
+            setDiaries(MOCK_DIARIES);
+          }
+        } catch (e) {
+          console.warn('Failed to load diaries in HomeScreen', e);
+        }
+      };
+      loadDiaries();
+    }, [])
+  );
 
   const handleSelectEmotion = (emotion: any) => {
     setSelectedEmotion(emotion);
     setModalVisible(true);
   };
 
-  const handleSubmitDiary = (reason: string) => {
-    // Lưu tạm vào state để hiển thị lên Lịch
-    setTodayEmotion(selectedEmotion);
-    
-    alert(`Đã lưu nhật ký!\nCảm xúc: ${selectedEmotion?.name}\nLý do: ${reason}`);
+  const handleSubmitDiary = async (reason: string) => {
+    if (!selectedEmotion) return;
+
+    try {
+      // 1. Tạo entry nhật ký nhanh cho hôm nay
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = (now.getMonth() + 1).toString().padStart(2, '0');
+      const d = now.getDate().toString().padStart(2, '0');
+      const dateStr = `${y}-${m}-${d}`;
+      const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+      const created_at = `${dateStr}T${timeStr}Z`;
+
+      const newEntry = {
+        id: Date.now(),
+        title: 'Nhật ký nhanh',
+        content: reason,
+        emotion_id: selectedEmotion.id,
+        emotion_name: selectedEmotion.name,
+        image_url: null,
+        created_at,
+      };
+
+      // 2. Cập nhật và lưu vào AsyncStorage
+      const updatedList = [newEntry, ...diaries];
+      setDiaries(updatedList);
+      await AsyncStorage.setItem('@diaries_data_key', JSON.stringify(updatedList));
+
+      Alert.alert('Thành công', 'Nhật ký của cậu đã được lưu lại nhé 🤍');
+    } catch (e) {
+      console.warn('Failed to save quick diary', e);
+      Alert.alert('Lỗi', 'Không thể lưu nhật ký, cậu vui lòng thử lại.');
+    }
+
     setModalVisible(false);
     setTimeout(() => {
       setSelectedEmotion(null);
@@ -62,7 +112,7 @@ export default function HomeScreen() {
               <Feather name="bell" size={26} color="#000" />
             </TouchableOpacity>
             <Image
-              source={{ uri: 'https://i.pinimg.com/736x/8f/c2/f7/8fc2f7db2c453e00b847847b2c589083.jpg' }}
+              source={{ uri: 'https://i.pravatar.cc/150?img=3' }}
               style={styles.avatar}
             />
           </View>
@@ -74,7 +124,7 @@ export default function HomeScreen() {
         >
           <EmotionTracker onSelectEmotion={handleSelectEmotion} />
 
-          <WeeklyCalendar todayEmotion={todayEmotion} />
+          <WeeklyCalendar diaries={diaries} />
 
           <TestReminder />
 
