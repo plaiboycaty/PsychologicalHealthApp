@@ -61,60 +61,238 @@ export const MOCK_DIARIES = [
 // ==========================================
 // 3. DỮ LIỆU BÀI TEST TÂM LÝ
 // ==========================================
-export const MOCK_TESTS = [
-  {
-    id: 1,
-    title: 'Thang đo Lo âu Zung (SAS)',
-    description: 'Bài kiểm tra 20 câu hỏi giúp đánh giá mức độ lo âu của bạn trong 1-2 tuần qua.',
-    question_count: 20,
-    duration: '5-10 phút'
-  },
-  {
-    id: 2,
-    title: 'Thang đo Trầm cảm Beck (BDI)',
-    description: 'Đánh giá chi tiết các triệu chứng trầm cảm và mức độ nghiêm trọng.',
-    question_count: 21,
-    duration: '10-15 phút'
-  }
-];
-
-// Chi tiết 1 bài test (Ví dụ vài câu của bài Zung)
-export const MOCK_TEST_DETAILS = {
-  id: 1,
-  title: 'Thang đo Lo âu Zung (SAS)',
+export const MOCK_TESTS = {
+  test_id: 1,
+  name: "Bậc thang đánh giá lo âu ZUNG (SAS)",
+  total_questions: 5,
   questions: [
     {
-      id: 101,
-      content: 'Tôi cảm thấy lo lắng và bồn chồn vô cớ',
+      question_id: 1,
+      question_order: 1,
+      content: "Tôi cảm thấy nóng nảy và lo âu hơn thường lệ.",
       options: [
-        { id: 1, content: 'Không bao giờ', score: 1 },
-        { id: 2, content: 'Đôi khi', score: 2 },
-        { id: 3, content: 'Thường xuyên', score: 3 },
-        { id: 4, content: 'Hầu như luôn luôn', score: 4 }
+        { option_id: 101, content: "Không có", score: 1 },
+        { option_id: 102, content: "Đôi khi", score: 2 },
+        { option_id: 103, content: "Thường xuyên", score: 3 },
+        { option_id: 104, content: "Luôn luôn", score: 4 }
       ]
     },
     {
-      id: 102,
-      content: 'Tôi dễ bị run rẩy tay chân',
+      question_id: 2,
+      question_order: 2,
+      content: "Câu 16: Chọn phát biểu đúng nhất về giấc ngủ",
+      // Ví dụ mô phỏng bài BECK có nhiều đáp án và chữ rất dài
       options: [
-        { id: 5, content: 'Không bao giờ', score: 1 },
-        { id: 6, content: 'Đôi khi', score: 2 },
-        { id: 7, content: 'Thường xuyên', score: 3 },
-        { id: 8, content: 'Hầu như luôn luôn', score: 4 }
+        { option_id: 201, content: "Không thấy có chút thay đổi gì trong giấc ngủ của tôi.", score: 0 },
+        { option_id: 202, content: "Tôi ngủ hơi nhiều hơn trước.", score: 1 },
+        { option_id: 203, content: "Tôi ngủ hơi ít hơn trước.", score: 1 },
+        { option_id: 204, content: "Tôi thức dậy 1-2 giờ sớm hơn trước và không thể ngủ lại được.", score: 3 }
       ]
     },
     {
-      id: 103,
-      content: 'Tôi cảm thấy tim đập nhanh hoặc đánh trống ngực',
+      question_id: 3,
+      question_order: 3,
+      content: "Tôi cảm thấy dễ khóc hoặc muốn khóc.",
       options: [
-        { id: 9, content: 'Không bao giờ', score: 1 },
-        { id: 10, content: 'Đôi khi', score: 2 },
-        { id: 11, content: 'Thường xuyên', score: 3 },
-        { id: 12, content: 'Hầu như luôn luôn', score: 4 }
+        { option_id: 301, content: "Không có", score: 1 },
+        { option_id: 302, content: "Đôi khi", score: 2 },
+        { option_id: 303, content: "Thường xuyên", score: 3 },
+        { option_id: 304, content: "Luôn luôn", score: 4 }
+      ]
+    },
+    {
+      question_id: 4,
+      question_order: 4,
+      content: "Tôi cảm thấy tim mình đập nhanh hoặc đập mạnh hơn bình thường.",
+      options: [
+        { option_id: 401, content: "Không có", score: 1 },
+        { option_id: 402, content: "Đôi khi", score: 2 },
+        { option_id: 403, content: "Thường xuyên", score: 3 },
+        { option_id: 404, content: "Luôn luôn", score: 4 }
+      ]
+    },
+    {
+      question_id: 5,
+      question_order: 5,
+      content: "Tôi cảm thấy lo sợ không có lý do rõ ràng.",
+      options: [
+        { option_id: 501, content: "Không có", score: 1 },
+        { option_id: 502, content: "Đôi khi", score: 2 },
+        { option_id: 503, content: "Thường xuyên", score: 3 },
+        { option_id: 504, content: "Luôn luôn", score: 4 }
       ]
     }
   ]
 };
+
+// Dữ liệu mock chi tiết cho từng loại bài test
+export const MOCK_TESTS_MAP: { [key: string]: typeof MOCK_TESTS } = {
+  zung: {
+    test_id: 1,
+    name: "Bậc thang đánh giá lo âu ZUNG (SAS)",
+    total_questions: 5,
+    questions: [
+      {
+        question_id: 1,
+        question_order: 1,
+        content: "Tôi cảm thấy nóng nảy và lo âu hơn thường lệ.",
+        options: [
+          { option_id: 101, content: "Không có", score: 1 },
+          { option_id: 102, content: "Đôi khi", score: 2 },
+          { option_id: 103, content: "Thường xuyên", score: 3 },
+          { option_id: 104, content: "Luôn luôn", score: 4 }
+        ]
+      },
+      {
+        question_id: 2,
+        question_order: 2,
+        content: "Tôi cảm thấy dễ khóc hoặc muốn khóc.",
+        options: [
+          { option_id: 201, content: "Không có", score: 1 },
+          { option_id: 202, content: "Đôi khi", score: 2 },
+          { option_id: 203, content: "Thường xuyên", score: 3 },
+          { option_id: 204, content: "Luôn luôn", score: 4 }
+        ]
+      },
+      {
+        question_id: 3,
+        question_order: 3,
+        content: "Tôi cảm thấy tim mình đập nhanh hoặc đập mạnh hơn bình thường.",
+        options: [
+          { option_id: 301, content: "Không có", score: 1 },
+          { option_id: 302, content: "Đôi khi", score: 2 },
+          { option_id: 303, content: "Thường xuyên", score: 3 },
+          { option_id: 304, content: "Luôn luôn", score: 4 }
+        ]
+      },
+      {
+        question_id: 4,
+        question_order: 4,
+        content: "Tôi cảm thấy lo sợ không có lý do rõ ràng.",
+        options: [
+          { option_id: 401, content: "Không có", score: 1 },
+          { option_id: 402, content: "Đôi khi", score: 2 },
+          { option_id: 403, content: "Thường xuyên", score: 3 },
+          { option_id: 404, content: "Luôn luôn", score: 4 }
+        ]
+      },
+      {
+        question_id: 5,
+        question_order: 5,
+        content: "Tôi dễ bị bực mình hoặc cảm thấy hoảng sợ.",
+        options: [
+          { option_id: 501, content: "Không có", score: 1 },
+          { option_id: 502, content: "Đôi khi", score: 2 },
+          { option_id: 503, content: "Thường xuyên", score: 3 },
+          { option_id: 504, content: "Luôn luôn", score: 4 }
+        ]
+      }
+    ]
+  },
+  beck: {
+    test_id: 2,
+    name: "Thang đánh giá trầm cảm BECK (BDI)",
+    total_questions: 4,
+    questions: [
+      {
+        question_id: 1,
+        question_order: 1,
+        content: "Đánh giá về cảm giác buồn bã hoặc thất vọng:",
+        options: [
+          { option_id: 101, content: "Tôi không cảm thấy buồn.", score: 0 },
+          { option_id: 102, content: "Nhiều lúc tôi cảm thấy buồn hoặc nản lòng.", score: 1 },
+          { option_id: 103, content: "Tôi luôn cảm thấy buồn và không thể thoát khỏi cảm giác đó.", score: 2 },
+          { option_id: 104, content: "Tôi quá buồn hoặc bất hạnh đến mức không thể chịu đựng nổi.", score: 3 }
+        ]
+      },
+      {
+        question_id: 2,
+        question_order: 2,
+        content: "Chọn phát biểu đúng nhất về giấc ngủ của bạn:",
+        options: [
+          { option_id: 201, content: "Không thấy có chút thay đổi gì trong giấc ngủ của tôi.", score: 0 },
+          { option_id: 202, content: "Tôi ngủ hơi nhiều hoặc hơi ít hơn trước một chút.", score: 1 },
+          { option_id: 203, content: "Tôi thức dậy sớm hơn trước 1-2 tiếng và thấy khó ngủ lại.", score: 2 },
+          { option_id: 204, content: "Tôi thức dậy quá sớm mỗi ngày và không thể ngủ lại được chút nào.", score: 3 }
+        ]
+      },
+      {
+        question_id: 3,
+        question_order: 3,
+        content: "Đánh giá mức độ tự ti hoặc tự trách bản thân:",
+        options: [
+          { option_id: 301, content: "Tôi không cảm thấy mình thất bại hơn người khác.", score: 0 },
+          { option_id: 302, content: "Tôi thấy mình đã thất bại nhiều hơn một người bình thường nên có chút thất vọng.", score: 1 },
+          { option_id: 303, content: "Nhìn lại cuộc đời, tôi thấy mình chỉ toàn là thất bại và sai lầm chồng chất.", score: 2 },
+          { option_id: 304, content: "Tôi cảm thấy mình hoàn toàn thất bại trong vai trò làm người.", score: 3 }
+        ]
+      },
+      {
+        question_id: 4,
+        question_order: 4,
+        content: "Ý nghĩ tự hại hoặc chán ghét cuộc sống hiện tại:",
+        options: [
+          { option_id: 401, content: "Tôi không có ý nghĩ tự gây tổn hại cho bản thân mình.", score: 0 },
+          { option_id: 402, content: "Tôi đôi khi có ý nghĩ tự hại nhưng tôi chắc chắn sẽ không bao giờ thực hiện.", score: 1 },
+          { option_id: 403, content: "Tôi muốn tự tử hoặc muốn chấm dứt mọi áp lực ngay lập tức.", score: 2 },
+          { option_id: 404, content: "Tôi sẽ tự tử nếu tôi có cơ hội hoặc điều kiện thuận lợi.", score: 3 }
+        ]
+      }
+    ]
+  },
+  young: {
+    test_id: 3,
+    name: "Thang đánh giá hưng cảm YOUNG (YMRS)",
+    total_questions: 4,
+    questions: [
+      {
+        question_id: 1,
+        question_order: 1,
+        content: "Tâm trạng vui vẻ hoặc phấn khích bất thường:",
+        options: [
+          { option_id: 101, content: "Tâm trạng bình thường, không quá phấn khích.", score: 0 },
+          { option_id: 102, content: "Hơi phấn khích, lạc quan thái quá khi nói chuyện.", score: 1 },
+          { option_id: 103, content: "Phấn khích rõ rệt, tràn đầy năng lượng một cách khác thường.", score: 2 },
+          { option_id: 104, content: "Cực kỳ phấn khích, cười nói liên tục, mất kiểm soát cảm xúc.", score: 4 }
+        ]
+      },
+      {
+        question_id: 2,
+        question_order: 2,
+        content: "Hoạt động thể chất hoặc tăng động lực hành động:",
+        options: [
+          { option_id: 201, content: "Hoạt động bình thường, không tăng năng suất bất thường.", score: 0 },
+          { option_id: 202, content: "Hơi năng động, có nhiều ý tưởng sáng tạo muốn làm.", score: 1 },
+          { option_id: 203, content: "Tăng hoạt động rõ rệt, chân tay bồn chồn không yên.", score: 2 },
+          { option_id: 204, content: "Tăng động cực độ, liên tục làm việc không nghỉ ngơi dù mệt.", score: 4 }
+        ]
+      },
+      {
+        question_id: 3,
+        question_order: 3,
+        content: "Nhu cầu ngủ và nghỉ ngơi:",
+        options: [
+          { option_id: 301, content: "Ngủ đủ giấc, bình thường không có vấn đề gì.", score: 0 },
+          { option_id: 302, content: "Giảm nhu cầu ngủ khoảng 1 tiếng nhưng vẫn thấy khỏe.", score: 1 },
+          { option_id: 303, content: "Giảm nhu cầu ngủ rõ rệt (chỉ ngủ 3-4 tiếng) nhưng tràn đầy sinh lực.", score: 2 },
+          { option_id: 304, content: "Hầu như không ngủ hoặc không cần ngủ mà không thấy mệt mỏi chút nào.", score: 4 }
+        ]
+      },
+      {
+        question_id: 4,
+        question_order: 4,
+        content: "Khả năng tập trung và tốc độ suy nghĩ:",
+        options: [
+          { option_id: 401, content: "Suy nghĩ bình thường, tập trung tốt vào công việc.", score: 0 },
+          { option_id: 402, content: "Suy nghĩ hơi nhanh, thỉnh thoảng hơi phân tâm nhẹ.", score: 1 },
+          { option_id: 403, content: "Suy nghĩ dồn dập, liên tục chuyển đổi ý tưởng.", score: 2 },
+          { option_id: 404, content: "Mất tập trung hoàn toàn, ý nghĩ hỗn loạn nhảy cóc liên tục.", score: 4 }
+        ]
+      }
+    ]
+  }
+};
+
 
 // ==========================================
 // 5. DỮ LIỆU THỐNG KÊ (Biểu đồ)

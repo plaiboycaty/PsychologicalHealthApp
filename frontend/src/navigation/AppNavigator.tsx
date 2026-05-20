@@ -12,6 +12,8 @@ import ProfileScreen from '../screens/profile/ProfileScreen';
 import PersonalInfoScreen from '../screens/profile/PersonalInfoScreen';
 import RoadmapScreen from '../screens/roadmap/RoadmapScreen';
 import DiaryScreen from '../screens/diaries/DiaryScreen';
+import QuestionScreen from '../screens/tests/QuestionScreen';
+import ResultScreen from '../screens/tests/ResultScreen';
 
 const Tab = createBottomTabNavigator<AppTabParamList>();
 const Stack = createNativeStackNavigator<AppStackParamList>();
@@ -72,6 +74,8 @@ const AnimatedRoadmap = withTabTransition(RoadmapScreen);
 const AnimatedDiaries = withTabTransition(DiaryScreen);
 const AnimatedProfile = withTabTransition(ProfileScreen);
 const AnimatedPersonalInfo = withTabTransition(PersonalInfoScreen);
+const AnimatedQuestion = withTabTransition(QuestionScreen);
+const AnimatedResult = withTabTransition(ResultScreen);
 
 function TabNavigator() {
   return (
@@ -112,6 +116,8 @@ export default function AppNavigator() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="MainTabs" component={TabNavigator} />
       <Stack.Screen name="PersonalInfo" component={AnimatedPersonalInfo} />
+      <Stack.Screen name="Question" component={AnimatedQuestion} />
+      <Stack.Screen name="Result" component={AnimatedResult} />
     </Stack.Navigator>
   );
 }

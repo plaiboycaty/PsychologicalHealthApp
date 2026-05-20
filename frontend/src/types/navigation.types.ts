@@ -17,4 +17,6 @@ export type AppTabParamList = {
 export type AppStackParamList = {
   MainTabs: undefined;
   PersonalInfo: undefined;
+  Question: { testId: string };
+  Result: { totalScore: number; category: string; testId: string };
 };

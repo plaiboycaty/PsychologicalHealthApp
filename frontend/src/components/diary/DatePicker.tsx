@@ -36,7 +36,7 @@ function toDateStr(date: Date): string {
 interface DatePickerProps {
   selectedDate: string; // 'YYYY-MM-DD'
   onSelectDate: (dateStr: string) => void;
-  onOpenCalendar?: () => void; // Prop để sau này bạn gọi Modal chọn Lịch
+  onOpenCalendar?: () => void;
 }
 
 export default function DatePicker({ selectedDate, onSelectDate, onOpenCalendar }: DatePickerProps) {

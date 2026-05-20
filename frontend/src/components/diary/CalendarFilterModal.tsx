@@ -140,7 +140,7 @@ export default function CalendarFilterModal({
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(45, 45, 45, 0.4)', // Nền tối mờ làm nổi bật modal
+        backgroundColor: 'rgba(45, 45, 45, 0.4)',
         justifyContent: 'flex-end',
     },
     backdrop: {

@@ -43,8 +43,10 @@ const TESTS = [
 ];
 
 export default function TestsScreen() {
+  const navigation = useNavigation<any>();
+
   const handleStartTest = (testId: string) => {
-    console.log('Bắt đầu test:', testId);
+    navigation.navigate('Question', { testId });
   };
 
   return (
