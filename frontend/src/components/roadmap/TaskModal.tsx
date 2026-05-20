@@ -16,7 +16,7 @@ import { WeekData } from '../../constants/roadmap-mock';
 
 const { width, height } = Dimensions.get('window');
 const MODAL_WIDTH = width * 0.88;
-const MINT_COLOR = '#44B5AE';
+const MINT_COLOR = '#39BFFF';
 
 interface TaskModalProps {
   visible: boolean;

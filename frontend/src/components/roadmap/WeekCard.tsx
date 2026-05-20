@@ -1,17 +1,12 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Dimensions,
-} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { WeekData } from '../../constants/roadmap-mock';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.62;
-const MINT_COLOR = '#4ABEB2';
+const ACTIVE_BLUE = '#39BFFF';
+const LOCKED_GRAY = '#C4C4C4';
 
 interface WeekCardProps {
   week: WeekData;
@@ -28,7 +23,7 @@ export default function WeekCard({ week, completedTasks, onPress }: WeekCardProp
 
   return (
     <TouchableOpacity
-      activeOpacity={isLocked ? 1 : 0.75}
+      activeOpacity={isLocked ? 1 : 0.8}
       onPress={() => !isLocked && onPress(week)}
       style={[
         styles.card,
@@ -36,20 +31,17 @@ export default function WeekCard({ week, completedTasks, onPress }: WeekCardProp
         isEven ? styles.alignRight : styles.alignLeft,
       ]}
     >
-      {/* Row: Icon + Tiêu đề */}
       <View style={styles.rowTop}>
-        {/* Icon nhỏ gọn */}
         <View style={[styles.iconCircle, isLocked ? styles.iconCircleLocked : styles.iconCircleUnlocked]}>
           {isLocked ? (
-            <Ionicons name="lock-closed" size={16} color="#BDBDBD" />
+            <Ionicons name="lock-closed" size={18} color="#999" />
           ) : week.status === 'completed' ? (
-            <Ionicons name="checkmark" size={18} color="#FFF" />
+            <Ionicons name="checkmark" size={20} color="#FFF" />
           ) : (
             <Text style={styles.weekNumberText}>{week.week_number}</Text>
           )}
         </View>
 
-        {/* Tên tuần + Tiêu đề */}
         <View style={styles.titleBlock}>
           <Text style={[styles.weekLabel, isLocked && styles.textLocked]}>Tuần {week.week_number}</Text>
           <Text style={[styles.weekTitle, isLocked && styles.textLocked]} numberOfLines={2}>
@@ -58,23 +50,30 @@ export default function WeekCard({ week, completedTasks, onPress }: WeekCardProp
         </View>
       </View>
 
-      {/* Progress Bar (chỉ hiện khi unlocked) */}
       {!isLocked && (
-        <View style={styles.progressRow}>
-          <Text style={[styles.progressLabel, progress === 100 && styles.progressLabelDone]}>
-            {progress === 100 ? 'Hoàn thành' : `${doneTasks}/${totalTasks} nhiệm vụ`}
-          </Text>
-          <Text style={styles.progressPercent}>{progress}%</Text>
-        </View>
-      )}
-      {!isLocked && (
-        <View style={styles.progressBarBg}>
-          <View style={[styles.progressBarFill, { width: `${progress}%` }]} />
+        <View style={styles.progressContainer}>
+          <View style={styles.progressRow}>
+            <Text style={[styles.progressLabel, progress === 100 && styles.progressLabelDone]}>
+              {progress === 100 ? 'Hoàn thành' : `${doneTasks}/${totalTasks} nhiệm vụ`}
+            </Text>
+            <Text style={styles.progressPercent}>{progress}%</Text>
+          </View>
+          <View style={styles.progressBarBg}>
+            <View style={[styles.progressBarFill, { width: `${progress}%` }]} />
+          </View>
         </View>
       )}
 
       {isLocked && (
-        <Text style={styles.lockedHint}>🔒 Chưa mở khóa</Text>
+        <View style={styles.progressContainer}>
+          <View style={styles.progressRow}>
+            <Text style={styles.lockedHint}>Hoàn thành</Text>
+            <Text style={styles.lockedHint}>0%</Text>
+          </View>
+          <View style={styles.progressBarBg}>
+            <View style={{ width: '0%' }} />
+          </View>
+        </View>
       )}
     </TouchableOpacity>
   );
@@ -84,111 +83,109 @@ const styles = StyleSheet.create({
   card: {
     width: CARD_WIDTH,
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    borderWidth: 3,
-    padding: 12,
-    marginBottom: 18,
+    borderRadius: 24,
+    borderWidth: 5,
+    padding: 14,
+    marginBottom: 40,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 5,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
   },
   cardUnlocked: {
-    borderColor: MINT_COLOR,
+    borderColor: ACTIVE_BLUE,
   },
   cardLocked: {
-    borderColor: '#E0E0E0',
+    borderColor: LOCKED_GRAY,
   },
   alignLeft: {
     alignSelf: 'flex-start',
-    marginLeft: 24,
+    marginLeft: 30,
   },
   alignRight: {
     alignSelf: 'flex-end',
-    marginRight: 24,
+    marginRight: 30,
   },
-
   rowTop: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 12,
   },
   iconCircle: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 10,
+    marginRight: 12,
     flexShrink: 0,
   },
   iconCircleUnlocked: {
-    backgroundColor: MINT_COLOR,
+    backgroundColor: ACTIVE_BLUE,
   },
   iconCircleLocked: {
     backgroundColor: '#F0F0F0',
   },
   weekNumberText: {
-    fontSize: 15,
+    fontSize: 18,
     color: '#FFF',
-    fontFamily: 'Baloo2_700Bold',
+    fontFamily: 'Baloo2_700Bold'
   },
-
   titleBlock: {
     flex: 1,
   },
   weekLabel: {
-    fontSize: 11,
-    color: MINT_COLOR,
-    fontFamily: 'Baloo2_700Bold',
+    fontSize: 12,
+    color: '#A0A0A0',
     textTransform: 'uppercase',
-    letterSpacing: 0.4,
+    fontFamily: 'Baloo2_400Regular'
   },
   weekTitle: {
-    fontSize: 14,
-    color: '#1A1A2E',
+    fontSize: 15,
+    color: '#000',
     fontFamily: 'Baloo2_700Bold',
-    marginTop: 1,
-    lineHeight: 18,
+    marginTop: 2,
+    lineHeight: 20,
   },
   textLocked: {
-    color: '#BDBDBD',
+    color: '#999',
   },
-
+  progressContainer: {
+    marginTop: 4,
+  },
   progressRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 4,
+    marginBottom: 6,
   },
   progressLabel: {
-    fontSize: 11,
-    color: '#999',
-    fontFamily: 'Baloo2_400Regular',
+    fontSize: 12,
+    color: '#A0A0A0',
+    fontFamily: 'Baloo2_700Bold'
   },
   progressLabelDone: {
-    color: MINT_COLOR,
+    color: ACTIVE_BLUE,
+    fontFamily: 'Baloo2_700Bold'
   },
   progressPercent: {
-    fontSize: 11,
-    color: MINT_COLOR,
-    fontFamily: 'Baloo2_700Bold',
+    fontSize: 12,
+    color: ACTIVE_BLUE,
+    fontFamily: 'Baloo2_700Bold'
   },
   progressBarBg: {
-    height: 5,
-    backgroundColor: '#EEF8F7',
+    height: 6,
+    backgroundColor: '#E0E0E0',
     borderRadius: 3,
     overflow: 'hidden',
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: MINT_COLOR,
+    backgroundColor: ACTIVE_BLUE,
     borderRadius: 3,
   },
-
   lockedHint: {
-    fontSize: 11,
-    color: '#C0C0C0',
-    fontFamily: 'Baloo2_400Regular',
+    fontSize: 12,
+    color: '#C4C4C4',
   },
 });

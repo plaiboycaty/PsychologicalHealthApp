@@ -26,6 +26,8 @@ Thiết kế lưu trữ câu hỏi và đáp án độc lập giúp hệ thống
 (id (Khóa chính), user_id (Khóa ngoại trỏ về `users`), test_id (Khóa ngoại trỏ về `tests`), total_score, category, created_at).
 * **`treatments`**: Lưu trữ các lộ trình hỗ trợ theo từng tuần, được ánh xạ (map) với kết quả phân loại của người dùng.
 (id (Khóa chính), category (Mức độ bệnh để map với test_results), week_number, title (Tiêu đề tuần), content(Nội dung, Task))
+* **`user_completed_tasks`**: Lưu trữ danh sách các nhiệm vụ trong lộ trình mà người dùng đã hoàn thành.
+(user_id (Khóa ngoại trỏ về `users`), task_id (Mã string của nhiệm vụ), created_at)
 
 ## 🔗 Mối quan hệ (Relationships)
 * `users` (1) --- (N) `diaries`
@@ -33,3 +35,4 @@ Thiết kế lưu trữ câu hỏi và đáp án độc lập giúp hệ thống
 * `tests` (1) --- (N) `questions`
 * `questions` (1) --- (N) `options`
 * `emotions` (1) --- (N) `diaries`
+* `users` (1) --- (N) `user_completed_tasks`

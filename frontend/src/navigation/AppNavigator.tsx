@@ -2,8 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { AppTabParamList, AppStackParamList } from '../types/navigation.types';
-import { View, Text, TouchableOpacity, StyleSheet, Platform, Animated } from 'react-native';
-import { useAuthStore } from '../store/auth.store';
+import { StyleSheet, Platform, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useIsFocused } from '@react-navigation/native';
 

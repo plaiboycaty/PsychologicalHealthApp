@@ -8,7 +8,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { TaskItem } from '../../constants/roadmap-mock';
 
-const MINT_COLOR = '#4ABEB2';
+const ACTIVE_BLUE = '#39BFFF';
 
 interface TaskRowProps {
   task: TaskItem;
@@ -53,8 +53,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   containerCompleted: {
-    backgroundColor: '#EEF8F7',
-    borderColor: '#B2E6E2',
+    backgroundColor: '#C6EDFF',
+    borderColor: '#39BFFF',
   },
   checkbox: {
     width: 26,
@@ -68,8 +68,8 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   checkboxCompleted: {
-    backgroundColor: MINT_COLOR,
-    borderColor: MINT_COLOR,
+    backgroundColor: ACTIVE_BLUE,
+    borderColor: ACTIVE_BLUE,
   },
   textBlock: {
     flex: 1,
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   taskTitleCompleted: {
-    color: '#4ABEB2',
+    color: ACTIVE_BLUE,
   },
   taskDesc: {
     fontSize: 13,
