@@ -45,7 +45,7 @@ export const MOCK_DIARIES = [
     emotion_id: 4,
     emotion_name: 'Hạnh phúc',
     image_url: 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=500&q=60',
-    created_at: '2026-05-18T10:00:00Z',
+    created_at: '2026-05-18T10:00:00+07:00',
   },
   {
     id: 2,
@@ -54,7 +54,7 @@ export const MOCK_DIARIES = [
     emotion_id: 5,
     emotion_name: 'Trống rỗng',
     image_url: null,
-    created_at: '2026-05-19T15:30:00Z',
+    created_at: '2026-05-19T15:30:00+07:00',
   }
 ];
 

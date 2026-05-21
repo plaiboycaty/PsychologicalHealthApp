@@ -140,7 +140,7 @@ export default function CalendarFilterModal({
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(45, 45, 45, 0.4)',
+        backgroundColor: '#2D2D2D',
         justifyContent: 'flex-end',
     },
     backdrop: {

@@ -26,7 +26,13 @@ interface DiaryDetailModalProps {
 }
 
 function formatDate(isoString: string): string {
-  const date = new Date(isoString);
+  if (!isoString) return '';
+  let date: Date;
+  if (isoString.includes('T') && !isoString.endsWith('Z') && !/[+-]\d{2}:\d{2}$/.test(isoString)) {
+    date = new Date(isoString.replace('T', ' '));
+  } else {
+    date = new Date(isoString);
+  }
   return date.toLocaleDateString('vi-VN', {
     weekday: 'long',
     year: 'numeric',

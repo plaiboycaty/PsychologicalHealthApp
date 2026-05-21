@@ -154,9 +154,18 @@ export default function DiaryScreen() {
     } else {
       // Đang THÊM MỚI nhật ký
       const now = new Date();
-      const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
-      // Gán nhật ký vào đúng ngày đang được chọn trên DatePicker
-      const created_at = `${selectedDate}T${timeStr}Z`;
+      const [year, month, day] = selectedDate.split('-').map(Number);
+      
+      // Tạo đối tượng Date chứa ngày được chọn và thời gian hiện tại (giờ địa phương)
+      const entryDate = new Date(
+        year,
+        month - 1,
+        day,
+        now.getHours(),
+        now.getMinutes(),
+        now.getSeconds()
+      );
+      const created_at = entryDate.toISOString();
 
       const newEntry: DiaryEntry = {
         id: Date.now(), // tạo ID duy nhất dựa trên timestamp

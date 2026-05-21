@@ -58,13 +58,7 @@ export default function HomeScreen() {
 
     try {
       // 1. Tạo entry nhật ký nhanh cho hôm nay
-      const now = new Date();
-      const y = now.getFullYear();
-      const m = (now.getMonth() + 1).toString().padStart(2, '0');
-      const d = now.getDate().toString().padStart(2, '0');
-      const dateStr = `${y}-${m}-${d}`;
-      const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
-      const created_at = `${dateStr}T${timeStr}Z`;
+      const created_at = new Date().toISOString();
 
       const newEntry = {
         id: Date.now(),
