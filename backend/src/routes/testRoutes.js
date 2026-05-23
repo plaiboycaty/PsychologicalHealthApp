@@ -7,6 +7,9 @@ const optionalAuthMiddleware = require('../middlewares/optionalAuthMiddleware');
 // Lấy danh sách bài Test (Public)
 router.get('/', testController.getAllTests);
 
+// Lấy ngày làm bài test gần nhất (Protected - Bắt buộc phải đăng nhập)
+router.get('/latest', authMiddleware, testController.getLatestTest);
+
 // Lấy thông tin chi tiết một bộ câu hỏi (Public cho Khách xem)
 router.get('/:id', testController.getTestDetail);
 

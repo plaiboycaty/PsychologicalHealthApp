@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useAuthStore } from '../store/auth.store';
+
 
 // Cấu hình URL mặc định của Backend XAMPP
 // Lưu ý: Chạy trên máy ảo Android (Emulator), localhost của máy tính phải được gọi bằng IP: 10.0.2.2
@@ -17,7 +17,8 @@ const axiosClient = axios.create({
 // REQUEST INTERCEPTOR: Kiểm tra token trước khi gửi đi
 axiosClient.interceptors.request.use(
   async (config) => {
-    // Móc vào kho Zustand để lấy token hiện tại
+    // Móc vào kho Zustand bằng require cục bộ để tránh Require cycle
+    const { useAuthStore } = require('../store/auth.store');
     const token = useAuthStore.getState().token;
 
     // Nếu có token, tự động nhét vào Header Authorization
@@ -49,7 +50,8 @@ axiosClient.interceptors.response.use(
     if (statusCode === 401) {
       console.warn('[Axios] Lỗi 401: Token hết hạn hoặc không hợp lệ!');
 
-      // Gọi lệnh logout trong kho Zustand để đá người dùng ra màn hình Đăng Nhập
+      // Gọi lệnh logout trong kho Zustand bằng require cục bộ
+      const { useAuthStore } = require('../store/auth.store');
       useAuthStore.getState().logout();
     }
 

@@ -13,8 +13,9 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
+import { useAuthStore } from '../../store/auth.store';
+import { diaryApi } from '../../services/diaryApi';
 import { MOCK_DIARIES } from '../../constants/mock-data';
 import EmotionModal from '../../components/homescreen/EmotionModal';
 import EmotionTracker from '../../components/homescreen/EmotionTracker';
@@ -28,17 +29,18 @@ export default function HomeScreen() {
   const [selectedEmotion, setSelectedEmotion] = useState<any>(null);
   const [isModalVisible, setModalVisible] = useState(false);
   const [diaries, setDiaries] = useState<any[]>([]);
+  
+  // Lấy user từ store
+  const user = useAuthStore(state => state.user);
 
-  // Đọc danh sách nhật ký từ AsyncStorage mỗi khi HomeScreen được focus
+  // Đọc danh sách nhật ký từ API mỗi khi HomeScreen được focus
   useFocusEffect(
     useCallback(() => {
       const loadDiaries = async () => {
         try {
-          const stored = await AsyncStorage.getItem('@diaries_data_key');
-          if (stored !== null) {
-            setDiaries(JSON.parse(stored));
-          } else {
-            setDiaries(MOCK_DIARIES);
+          const response: any = await diaryApi.getMyDiaries();
+          if (response && response.data) {
+            setDiaries(response.data);
           }
         } catch (e) {
           console.warn('Failed to load diaries in HomeScreen', e);
@@ -57,23 +59,26 @@ export default function HomeScreen() {
     if (!selectedEmotion) return;
 
     try {
-      // 1. Tạo entry nhật ký nhanh cho hôm nay
-      const created_at = new Date().toISOString();
+      // Gọi API lưu nhật ký
+      const response: any = await diaryApi.addDiary({
+        emotion_id: selectedEmotion.id,
+        title: 'Nhật ký nhanh',
+        content: reason,
+        image_url: null,
+      });
 
+      // Tạo entry tạm thời để update UI ngay lập tức mà không cần fetch lại
       const newEntry = {
-        id: Date.now(),
+        id: response.diary_id || Date.now(),
         title: 'Nhật ký nhanh',
         content: reason,
         emotion_id: selectedEmotion.id,
         emotion_name: selectedEmotion.name,
         image_url: null,
-        created_at,
+        created_at: new Date().toISOString(),
       };
 
-      // 2. Cập nhật và lưu vào AsyncStorage
-      const updatedList = [newEntry, ...diaries];
-      setDiaries(updatedList);
-      await AsyncStorage.setItem('@diaries_data_key', JSON.stringify(updatedList));
+      setDiaries([newEntry, ...diaries]);
 
       Alert.alert('Thành công', 'Nhật ký của cậu đã được lưu lại nhé 🤍');
     } catch (e) {
@@ -99,14 +104,14 @@ export default function HomeScreen() {
         <View style={styles.headerContent}>
           <View>
             <Text style={styles.greetingText}>Xin chào,</Text>
-            <Text style={styles.nameText}>Tran Minh Quan</Text>
+            <Text style={styles.nameText}>{user?.full_name || 'Khách'}</Text>
           </View>
           <View style={styles.headerRight}>
             <TouchableOpacity style={styles.bellIcon}>
               <Feather name="bell" size={26} color="#000" />
             </TouchableOpacity>
             <Image
-              source={{ uri: 'https://i.pravatar.cc/150?img=3' }}
+              source={user?.avatar_url ? { uri: user.avatar_url } : require('../../../assets/images/emotions/happy.png')}
               style={styles.avatar}
             />
           </View>

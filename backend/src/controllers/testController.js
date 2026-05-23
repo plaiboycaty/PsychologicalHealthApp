@@ -164,6 +164,28 @@ const testController = {
     } catch (error) {
       next(error);
     }
+  },
+
+  // GET /api/tests/latest
+  getLatestTest: async (req, res, next) => {
+    try {
+      const userId = req.user.user_id;
+      const latestTest = await testModel.getLatestTestResultByUserId(userId);
+      
+      if (!latestTest) {
+        return res.status(200).json({ 
+          message: 'Người dùng chưa làm bài test nào',
+          data: null
+        });
+      }
+
+      res.status(200).json({
+        message: 'Lấy ngày làm bài test gần nhất thành công',
+        data: latestTest
+      });
+    } catch (error) {
+      next(error);
+    }
   }
 };
 

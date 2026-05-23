@@ -1,10 +1,40 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
+import { testApi } from '../../services/testApi';
 
 const mintColor = '#4ABEB2';
 
 export default function TestReminder() {
+  const [daysSince, setDaysSince] = useState<number | null>(null);
+  const [hasTested, setHasTested] = useState<boolean>(true);
+
+  useFocusEffect(
+    useCallback(() => {
+      const fetchLatestTest = async () => {
+        try {
+          const response: any = await testApi.getLatestTest();
+          if (response && response.data) {
+            const testDate = new Date(response.data.created_at);
+            const today = new Date();
+            const diffTime = Math.abs(today.getTime() - testDate.getTime());
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+            setDaysSince(diffDays);
+            setHasTested(true);
+          } else {
+            setHasTested(false);
+          }
+        } catch (error) {
+          console.warn('Failed to fetch latest test date', error);
+        }
+      };
+
+      fetchLatestTest();
+    }, [])
+  );
+
   return (
     <View style={styles.reminderSection}>
       <View style={styles.reminderIconWrapper}>
@@ -13,7 +43,12 @@ export default function TestReminder() {
       <View style={styles.reminderContent}>
         <Text style={styles.reminderTitle}>Nhắc nhở đánh giá !!!</Text>
         <Text style={styles.reminderText}>
-          Đã 10 ngày kể từ lần đánh giá cuối. Làm bài test để theo dõi tiến trình!
+          {!hasTested
+            ? "Bạn chưa làm bài đánh giá tâm lý nào. Làm ngay để hệ thống hiểu bạn hơn!"
+            : daysSince === 0
+              ? "Bạn vừa làm bài đánh giá hôm nay. Theo dõi cảm xúc thường xuyên nhé!"
+              : `Đã ${daysSince} ngày kể từ lần đánh giá cuối. Làm bài test để theo dõi tiến trình!`
+          }
         </Text>
         <TouchableOpacity>
           <Text style={styles.reminderLink}>Làm ngay {'->'}</Text>
