@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
   reminderSection: {
     backgroundColor: 'white',
     borderRadius: 24,
-    padding: 15, // Giảm padding
+    padding: 15,
     flexDirection: 'row',
     alignItems: 'center',
     shadowColor: '#000',
@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   reminderIconWrapper: {
-    width: 55, // Nhỏ lại
+    width: 55,
     height: 55,
     borderRadius: 15,
     backgroundColor: '#FEF0E6',
@@ -49,13 +49,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   reminderTitle: {
-    fontSize: 15, // Nhỏ lại
+    fontSize: 15,
     fontFamily: 'Baloo2_700Bold',
     color: '#000',
-    marginBottom: 4, // Thu hẹp khoảng cách
+    marginBottom: 4,
   },
   reminderText: {
-    fontSize: 12, // Nhỏ lại
+    fontSize: 12,
     color: '#666',
     lineHeight: 16,
     marginBottom: 6,

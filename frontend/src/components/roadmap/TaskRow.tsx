@@ -53,8 +53,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   containerCompleted: {
-    backgroundColor: '#C6EDFF',
-    borderColor: '#39BFFF',
+    backgroundColor: '#E3F7FF',
+    borderColor: '#82D7FE',
   },
   checkbox: {
     width: 26,

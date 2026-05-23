@@ -21,13 +21,13 @@ export default function WeeklyCalendar({ diaries }: WeeklyCalendarProps) {
   const { weekDates, monthTitle } = useMemo(() => {
     const currentDay = currentDate.getDay();
     const diffToMonday = currentDate.getDate() - currentDay + (currentDay === 0 ? -6 : 1);
-    
+
     const week = [];
     for (let i = 0; i < 7; i++) {
       const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), diffToMonday + i);
       const isToday = date.toDateString() === new Date().toDateString();
       const isFuture = date.getTime() > new Date().getTime() && !isToday;
-      
+
       const dateStr = toLocalDateStr(date);
       const entryForDate = diaries.find(d => d.created_at.startsWith(dateStr));
       const matchedEmotion = entryForDate ? MOCK_EMOTIONS.find(e => e.id === entryForDate.emotion_id) : null;
@@ -43,7 +43,7 @@ export default function WeeklyCalendar({ diaries }: WeeklyCalendarProps) {
 
     const monthEng = currentDate.toLocaleString('en-US', { month: 'long' });
     const monthVN = currentDate.getMonth() + 1;
-    
+
     return {
       weekDates: week,
       monthTitle: `${monthEng} - Tháng ${monthVN}`
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
   calendarSection: {
     backgroundColor: 'white',
     borderRadius: 24,
-    padding: 15, // Giảm padding
+    padding: 15,
     marginBottom: 15,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
@@ -117,10 +117,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 15, // Giảm margin
+    marginBottom: 15,
   },
   calendarTitle: {
-    fontSize: 15, // Thu nhỏ tiêu đề
+    fontSize: 15,
     fontFamily: 'Baloo2_700Bold',
     color: '#333',
   },
@@ -133,10 +133,10 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   dayText: {
-    fontSize: 14, // Thu nhỏ text
+    fontSize: 14,
     fontFamily: 'Baloo2_700Bold',
     color: '#000',
-    width: 30, // Thu hẹp độ rộng
+    width: 30,
     textAlign: 'center',
   },
   datesRow: {
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
     width: 30,
   },
   dateCircle: {
-    width: 28, // Nhỏ lại
+    width: 28,
     height: 28,
     borderRadius: 14,
     alignItems: 'center',
@@ -164,11 +164,11 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   historyIcon: {
-    width: 24, // Nhỏ lại
+    width: 24,
     height: 24,
   },
   emptyIconCircle: {
-    width: 20, // Nhỏ lại
+    width: 20,
     height: 20,
     borderRadius: 10,
     backgroundColor: '#D9D9D9',

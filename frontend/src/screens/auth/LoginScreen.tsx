@@ -9,6 +9,8 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   ImageBackground,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -17,6 +19,7 @@ import { AuthStackParamList } from '../../types/navigation.types';
 import { useAuthStore } from '../../store/auth.store';
 import { validateLoginForm } from '../../utils/validators';
 import AuthInput from '../../components/auth/AuthInput';
+import { authApi } from '../../services/authApi';
 
 type NavigationProp = NativeStackNavigationProp<AuthStackParamList, 'Login'>;
 
@@ -28,9 +31,10 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [isLoading, setIsLoading] = useState(false);
   const loginAction = useAuthStore((state) => state.login);
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     Keyboard.dismiss();
     const newErrors = validateLoginForm(email, password);
     if (Object.keys(newErrors).length > 0) {
@@ -38,15 +42,18 @@ export default function LoginScreen() {
       return;
     }
     setErrors({});
-    loginAction('mock-token-123', {
-      id: 1,
-      email: email,
-      full_name: 'Trần Minh Quân',
-      gender: 'Male',
-      dob: '2000-01-01',
-      avatar_url: undefined,
-      treatment_status: 'none',
-    });
+    setIsLoading(true);
+
+    try {
+      const response: any = await authApi.login(email, password);
+      // Backend trả về message, token, user
+      loginAction(response.token, response.user);
+    } catch (error: any) {
+      const message = error.response?.data?.message || 'Có lỗi xảy ra, vui lòng thử lại sau.';
+      Alert.alert('Đăng nhập thất bại', message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleGuestLogin = () => {
@@ -115,8 +122,16 @@ export default function LoginScreen() {
                 <Text style={styles.forgotPasswordText}>Quên mật khẩu?</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-                <Text style={styles.loginButtonText}>Đăng nhập</Text>
+              <TouchableOpacity
+                style={[styles.loginButton, isLoading && { opacity: 0.7 }]}
+                onPress={handleLogin}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <ActivityIndicator color="white" />
+                ) : (
+                  <Text style={styles.loginButtonText}>Đăng nhập</Text>
+                )}
               </TouchableOpacity>
 
               <TouchableOpacity onPress={handleGuestLogin} style={styles.guestButton}>

@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
   chatBubble: {
-    borderWidth: 9,
+    borderWidth: 8,
     borderColor: '#000000',
     borderRadius: 28,
     paddingHorizontal: 25,
@@ -167,9 +167,9 @@ const styles = StyleSheet.create({
   chatTail: {
     position: 'absolute',
     bottom: -18,
-    left: width * 0.22,
-    width: 38,
-    height: 38,
+    left: width * 0.19,
+    width: 41,
+    height: 41,
     borderLeftWidth: 9,
     borderBottomWidth: 9,
     borderTopWidth: 0,

@@ -10,6 +10,8 @@ import {
   ImageBackground,
   StatusBar,
   ScrollView,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -19,6 +21,7 @@ import { Feather } from '@expo/vector-icons';
 import { useAuthStore } from '../../store/auth.store';
 import { validateRegisterForm } from '../../utils/validators';
 import AuthInput from '../../components/auth/AuthInput';
+import { authApi } from '../../services/authApi';
 
 type NavigationProp = NativeStackNavigationProp<AuthStackParamList, 'Register'>;
 
@@ -37,10 +40,11 @@ export default function RegisterScreen() {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const [errors, setErrors] = useState<any>({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const loginAction = useAuthStore((state) => state.login);
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     Keyboard.dismiss();
 
     const newErrors = validateRegisterForm(fullName, email, password, confirmPassword, gender, dob);
@@ -54,7 +58,27 @@ export default function RegisterScreen() {
     const dobParts = dob.split('/');
     const apiDob = `${dobParts[2]}-${dobParts[1]}-${dobParts[0]}`;
 
-    alert(`Dữ liệu sạch gửi đi API:\nEmail: ${email}\nGender: ${gender || 'Chưa chọn'}\nDOB: ${apiDob}`);
+    setIsLoading(true);
+    try {
+      await authApi.register({
+        full_name: fullName,
+        email,
+        password,
+        gender: gender || 'Other',
+        dob: apiDob,
+      });
+
+      Alert.alert(
+        'Đăng ký thành công',
+        'Tài khoản của bạn đã được tạo. Vui lòng đăng nhập để tiếp tục.',
+        [{ text: 'OK', onPress: () => navigation.goBack() }]
+      );
+    } catch (error: any) {
+      const message = error.response?.data?.message || 'Có lỗi xảy ra, vui lòng thử lại sau.';
+      Alert.alert('Đăng ký thất bại', message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -171,8 +195,16 @@ export default function RegisterScreen() {
                 />
 
                 {/* Nút Đăng ký */}
-                <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
-                  <Text style={styles.registerButtonText}>Đăng ký</Text>
+                <TouchableOpacity
+                  style={[styles.registerButton, isLoading && { opacity: 0.7 }]}
+                  onPress={handleRegister}
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <ActivityIndicator color="white" />
+                  ) : (
+                    <Text style={styles.registerButtonText}>Đăng ký</Text>
+                  )}
                 </TouchableOpacity>
 
                 {/* Quay lại Đăng nhập */}

@@ -18,7 +18,7 @@ const mintColor = '#4ABEB2';
 const TESTS = [
   {
     id: 'zung',
-    title: 'BÀI ĐÁNH GIÁ LO ÂU',
+    title: 'BÀI ĐÁNH GIÁ LO ÂU ZUNG',
     description:
       'Dưới đây là 20 câu mô tả một số triệu chứng của cơ thể. Ở mỗi câu, hãy chọn một mức độ phù hợp nhất với tình trạng mà bạn cảm thấy trong vòng 1 tuần vừa qua......',
     image: require('../../../assets/images/test_images/zung.png'),
@@ -26,7 +26,7 @@ const TESTS = [
   },
   {
     id: 'beck',
-    title: 'BÀI ĐÁNH GIÁ TRẦM CẢM',
+    title: 'BÀI ĐÁNH GIÁ TRẦM CẢM BECK',
     description:
       'Dưới đây là 20 câu mô tả một số triệu chứng của cơ thể. Ở mỗi câu, hãy chọn một mức độ phù hợp nhất với tình trạng mà bạn cảm thấy trong vòng 1 tuần vừa qua......',
     image: require('../../../assets/images/test_images/beck.png'),
@@ -34,7 +34,7 @@ const TESTS = [
   },
   {
     id: 'young',
-    title: 'BÀI ĐÁNH GIÁ HƯNG CẢM',
+    title: 'BÀI ĐÁNH GIÁ HƯNG CẢM YOUNG',
     description:
       'Dưới đây là 20 câu mô tả một số triệu chứng của cơ thể. Ở mỗi câu, hãy chọn một mức độ phù hợp nhất với tình trạng mà bạn cảm thấy trong vòng 1 tuần vừa qua......',
     image: require('../../../assets/images/test_images/young.png'),

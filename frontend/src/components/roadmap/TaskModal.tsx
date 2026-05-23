@@ -16,7 +16,7 @@ import { WeekData } from '../../constants/roadmap-mock';
 
 const { width, height } = Dimensions.get('window');
 const MODAL_WIDTH = width * 0.88;
-const MINT_COLOR = '#39BFFF';
+const BLUE_COLOR = '#39BFFF';
 
 interface TaskModalProps {
   visible: boolean;
@@ -38,6 +38,9 @@ export default function TaskModal({
 
   useEffect(() => {
     if (visible) {
+      scaleAnim.setValue(0.88);
+      fadeAnim.setValue(0);
+
       Animated.parallel([
         Animated.spring(scaleAnim, {
           toValue: 1,
@@ -96,7 +99,7 @@ export default function TaskModal({
             { opacity: fadeAnim, transform: [{ scale: scaleAnim }] },
           ]}
         >
-          <View style={{ backgroundColor: MINT_COLOR, paddingBottom: 10 }}>
+          <View style={{ backgroundColor: BLUE_COLOR, paddingBottom: 10 }}>
             {/* ---- Header Xanh ---- */}
             <View style={styles.header}>
               <View style={styles.headerTextBlock}>
@@ -173,7 +176,7 @@ const styles = StyleSheet.create({
 
   // ----- Header -----
   header: {
-    backgroundColor: MINT_COLOR,
+    backgroundColor: BLUE_COLOR,
     paddingHorizontal: 18,
     paddingTop: 18,
     paddingBottom: 16,
@@ -221,7 +224,7 @@ const styles = StyleSheet.create({
   },
   progressValue: {
     fontSize: 15,
-    color: MINT_COLOR,
+    color: BLUE_COLOR,
     fontFamily: 'Baloo2_700Bold',
   },
   progressBarBg: {
@@ -232,7 +235,7 @@ const styles = StyleSheet.create({
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: MINT_COLOR,
+    backgroundColor: BLUE_COLOR,
     borderRadius: 3,
   },
 
