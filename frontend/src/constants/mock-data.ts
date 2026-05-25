@@ -190,7 +190,7 @@ export const MOCK_TESTS_MAP: { [key: string]: typeof MOCK_TESTS } = {
     ]
   },
   beck: {
-    test_id: 2,
+    test_id: 3,
     name: "Thang đánh giá trầm cảm BECK (BDI)",
     total_questions: 4,
     questions: [
@@ -241,7 +241,7 @@ export const MOCK_TESTS_MAP: { [key: string]: typeof MOCK_TESTS } = {
     ]
   },
   young: {
-    test_id: 3,
+    test_id: 2,
     name: "Thang đánh giá hưng cảm YOUNG (YMRS)",
     total_questions: 4,
     questions: [

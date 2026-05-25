@@ -29,7 +29,7 @@ export default function HomeScreen() {
   const [selectedEmotion, setSelectedEmotion] = useState<any>(null);
   const [isModalVisible, setModalVisible] = useState(false);
   const [diaries, setDiaries] = useState<any[]>([]);
-  
+
   // Lấy user từ store
   const user = useAuthStore(state => state.user);
 

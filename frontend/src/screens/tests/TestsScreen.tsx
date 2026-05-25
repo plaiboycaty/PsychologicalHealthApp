@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -10,42 +10,57 @@ import {
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { testApi } from '../../services/testApi';
+import ConfirmTestModal from '../../components/tests/ConfirmTestModal';
 
 const mintColor = '#4ABEB2';
 
-// Danh sách 3 bài test
-const TESTS = [
-  {
-    id: 'zung',
-    title: 'BÀI ĐÁNH GIÁ LO ÂU ZUNG',
-    description:
-      'Dưới đây là 20 câu mô tả một số triệu chứng của cơ thể. Ở mỗi câu, hãy chọn một mức độ phù hợp nhất với tình trạng mà bạn cảm thấy trong vòng 1 tuần vừa qua......',
+// Bản đồ tài nguyên tĩnh (Ảnh và màu sắc) ánh xạ theo ID của bài test trên Database
+const TEST_ASSETS: { [key: number]: any } = {
+  1: {
     image: require('../../../assets/images/test_images/zung.png'),
-    color: '#4ABEB2',
+    color: mintColor,
   },
-  {
-    id: 'beck',
-    title: 'BÀI ĐÁNH GIÁ TRẦM CẢM BECK',
-    description:
-      'Dưới đây là 20 câu mô tả một số triệu chứng của cơ thể. Ở mỗi câu, hãy chọn một mức độ phù hợp nhất với tình trạng mà bạn cảm thấy trong vòng 1 tuần vừa qua......',
-    image: require('../../../assets/images/test_images/beck.png'),
-    color: '#4ABEB2',
-  },
-  {
-    id: 'young',
-    title: 'BÀI ĐÁNH GIÁ HƯNG CẢM YOUNG',
-    description:
-      'Dưới đây là 20 câu mô tả một số triệu chứng của cơ thể. Ở mỗi câu, hãy chọn một mức độ phù hợp nhất với tình trạng mà bạn cảm thấy trong vòng 1 tuần vừa qua......',
+  2: {
     image: require('../../../assets/images/test_images/young.png'),
-    color: '#4ABEB2',
+    color: mintColor,
   },
-];
+  3: {
+    image: require('../../../assets/images/test_images/beck.png'),
+    color: mintColor,
+  }
+};
 
 export default function TestsScreen() {
   const navigation = useNavigation<any>();
+  const [tests, setTests] = useState<any[]>([]);
+  const [selectedTest, setSelectedTest] = useState<any>(null);
+  const [isModalVisible, setModalVisible] = useState(false);
 
-  const handleStartTest = (testId: string) => {
+  useFocusEffect(
+    useCallback(() => {
+      const fetchTests = async () => {
+        try {
+          const response: any = await testApi.getAllTests();
+          if (response && response.tests) {
+            setTests(response.tests);
+          }
+        } catch (error) {
+          console.warn('Failed to load tests', error);
+        }
+      };
+      fetchTests();
+    }, [])
+  );
+
+  const handlePressCard = (test: any) => {
+    setSelectedTest(test);
+    setModalVisible(true);
+  };
+
+  const handleStartTest = (testId: number) => {
+    setModalVisible(false);
     navigation.navigate('Question', { testId });
   };
 
@@ -65,27 +80,40 @@ export default function TestsScreen() {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          {TESTS.map((test) => (
-            <TouchableOpacity
-              key={test.id}
-              style={styles.testCard}
-              onPress={() => handleStartTest(test.id)}
-              activeOpacity={0.85}
-            >
-              {/* Tên bài test nằm trên cùng */}
-              <Text style={styles.testTitle}>{test.title}</Text>
+          {tests.map((test) => {
+            const asset = TEST_ASSETS[test.id] || TEST_ASSETS[1];
+            return (
+              <TouchableOpacity
+                key={test.id}
+                style={[styles.testCard, { backgroundColor: asset.color }]}
+                onPress={() => handlePressCard(test)}
+                activeOpacity={0.85}
+              >
+                {/* Tên bài test nằm trên cùng */}
+                <Text style={styles.testTitle}>{test.name}</Text>
 
-              {/* Row gồm ảnh + mô tả */}
-              <View style={styles.testBody}>
-                <Image source={test.image} style={styles.testImage} resizeMode="contain" />
-                <Text style={styles.testDescription}>{test.description}</Text>
-              </View>
-            </TouchableOpacity>
-          ))}
+                {/* Row gồm ảnh + mô tả */}
+                <View style={styles.testBody}>
+                  <Image source={asset.image} style={styles.testImage} resizeMode="contain" />
+                  <Text style={styles.testDescription} numberOfLines={6}>
+                    {test.description}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            );
+          })}
 
           {/* Khoảng trống tránh bị Bottom Tab che */}
           <View style={{ height: 110 }} />
         </ScrollView>
+
+        <ConfirmTestModal 
+          visible={isModalVisible}
+          test={selectedTest}
+          testAsset={selectedTest ? TEST_ASSETS[selectedTest.id] || TEST_ASSETS[1] : null}
+          onClose={() => setModalVisible(false)}
+          onConfirm={handleStartTest}
+        />
       </SafeAreaView>
     </View>
   );
@@ -128,7 +156,7 @@ const styles = StyleSheet.create({
   testCard: {
     backgroundColor: mintColor,
     borderRadius: 24,
-    padding: 20,
+    padding: 25,
     marginBottom: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 6 },

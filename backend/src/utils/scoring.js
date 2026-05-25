@@ -13,9 +13,23 @@ const evaluateZungAnxiety = (score) => {
   return 'Lo âu mức độ rất nặng';
 };
 
-// Nếu có bài BECK hay YOUNG thì định nghĩa hàm ở đây rồi export ra chung
-// const evaluateBeckDepression = (score) => { ... }
+const evaluateBeckDepression = (score) => {
+  if (score >= 0 && score <= 13) return 'Không có trầm cảm';
+  if (score >= 14 && score <= 19) return 'Trầm cảm mức độ nhẹ';
+  if (score >= 20 && score <= 29) return 'Trầm cảm mức độ vừa';
+  if (score >= 30) return 'Trầm cảm mức độ nặng';
+}
+
+const evaluateYMRS = (score) => {
+  if (score >= 0 && score <= 11) return 'Không có biểu hiện hưng cảm';
+  if (score >= 12 && score <= 20) return 'Hưng cảm mức độ nhẹ';
+  if (score >= 21 && score <= 30) return 'Hưng cảm mức độ vừa';
+  if (score >= 31) return 'Hưng cảm mức độ nặng';
+}
+
 
 module.exports = {
-  evaluateZungAnxiety
+  evaluateZungAnxiety,
+  evaluateBeckDepression,
+  evaluateYMRS,
 };

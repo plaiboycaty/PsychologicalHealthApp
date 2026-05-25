@@ -2,7 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
 interface Option {
-  option_id: number;
+  id?: number;
+  option_id?: number;
   content: string;
   score: number;
 }
@@ -23,15 +24,16 @@ export default function OptionsList({
   return (
     <View style={styles.optionsContainer}>
       {options.map((option) => {
-        const isSelected = selectedOptionId === option.option_id;
+        const oId = option.id ?? option.option_id;
+        const isSelected = selectedOptionId === oId;
         return (
           <TouchableOpacity
-            key={option.option_id}
+            key={oId}
             style={[
               styles.optionButton,
               isSelected && styles.optionButtonActive
             ]}
-            onPress={() => onSelectOption(option.option_id)}
+            onPress={() => onSelectOption(oId as number)}
             activeOpacity={0.8}
           >
             <Text style={styles.optionText}>

@@ -26,8 +26,8 @@ export default function ResultScreen() {
 
   const { totalScore, category, testId } = route.params;
 
-  const uiConfig = getResultUIConfig(category);
-  const testName = testId === 'zung' ? 'Lo âu' : testId === 'beck' ? 'Trầm cảm' : 'Hưng cảm';
+  const testName = Number(testId) === 1 ? 'Lo âu' : Number(testId) === 3 ? 'Trầm cảm' : 'Hưng cảm';
+  const uiConfig = getResultUIConfig(category, testName);
 
   const handleClose = () => {
     navigation.navigate('MainTabs');
@@ -59,7 +59,7 @@ export default function ResultScreen() {
           {/* PHẦN 1: ĐIỂM SỐ & MỨC ĐỘ */}
           <View style={styles.topSection}>
             <Text style={styles.scoreNumber}>{totalScore}</Text>
-            <Text style={styles.categoryText}>{testName} mức độ {category}</Text>
+            <Text style={styles.categoryText}>{category}</Text>
           </View>
 
           {/* PHẦN 2: KHUNG CHAT (TEXTBOX) & MÈO */}

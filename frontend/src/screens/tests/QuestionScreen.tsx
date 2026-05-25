@@ -11,7 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AppStackParamList } from '../../types/navigation.types';
-import { MOCK_TESTS_MAP } from '../../constants/mock-data';
+import { testApi } from '../../services/testApi';
 
 // Import subcomponents
 import QuestionHeader from '../../components/tests/QuestionHeader';
@@ -30,26 +30,50 @@ export default function QuestionScreen() {
   const route = useRoute<RouteProps>();
   const { testId } = route.params;
 
-  const testDetails = useMemo(() => {
-    return MOCK_TESTS_MAP[testId] || MOCK_TESTS_MAP['zung'];
-  }, [testId]);
-
-  const questions = testDetails.questions;
-  const totalQuestions = testDetails.total_questions;
+  const [testDetails, setTestDetails] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<{ [key: number]: number }>({});
   const [cancelModalVisible, setCancelModalVisible] = useState(false);
   const [submitModalVisible, setSubmitModalVisible] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  React.useEffect(() => {
+    const fetchTestDetails = async () => {
+      try {
+        const response: any = await testApi.getTestDetail(Number(testId));
+        if (response && response.test) {
+          setTestDetails(response.test);
+        }
+      } catch (error) {
+        console.warn('Failed to fetch test detail', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchTestDetails();
+  }, [testId]);
+
+  if (isLoading || !testDetails) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <Text>Đang tải dữ liệu bài kiểm tra...</Text>
+      </View>
+    );
+  }
+
+  const questions = testDetails.questions;
+  const totalQuestions = questions.length;
 
   const currentQuestion = questions[currentIndex];
-  const selectedOptionId = answers[currentQuestion.question_id];
+  const selectedOptionId = answers[currentQuestion.id];
   const isOptionSelected = selectedOptionId !== undefined;
 
   const handleSelectOption = (optionId: number) => {
     setAnswers(prev => ({
       ...prev,
-      [currentQuestion.question_id]: optionId,
+      [currentQuestion.id]: optionId,
     }));
   };
 
@@ -72,43 +96,29 @@ export default function QuestionScreen() {
     navigation.goBack();
   };
 
-  const handleSubmitTest = () => {
+  const handleSubmitTest = async () => {
     setSubmitModalVisible(false);
-    let totalScore = 0;
-    questions.forEach(q => {
-      const selectedId = answers[q.question_id];
-      const option = q.options.find(o => o.option_id === selectedId);
-      if (option) {
-        totalScore += option.score;
+    setIsSubmitting(true);
+
+    try {
+      const optionIds = Object.values(answers);
+      const response: any = await testApi.submitTest({
+        test_id: Number(testId),
+        option_ids: optionIds
+      });
+
+      if (response && response.result) {
+        navigation.navigate('Result', {
+          testId: String(testId),
+          totalScore: response.result.total_score,
+          category: response.result.category,
+        });
       }
-    });
-
-    let category = 'Bình thường';
-    if (testId === 'zung') {
-      if (totalScore >= 19) category = 'Rất nặng';
-      else if (totalScore >= 16) category = 'Nặng';
-      else if (totalScore >= 12) category = 'Vừa';
-      else if (totalScore >= 9) category = 'Nhẹ';
-      else category = 'Bình thường';
-    } else if (testId === 'beck') {
-      if (totalScore >= 11) category = 'Rất nặng';
-      else if (totalScore >= 9) category = 'Nặng';
-      else if (totalScore >= 6) category = 'Vừa';
-      else if (totalScore >= 4) category = 'Nhẹ';
-      else category = 'Bình thường';
-    } else {
-      if (totalScore >= 14) category = 'Rất nặng';
-      else if (totalScore >= 11) category = 'Nặng';
-      else if (totalScore >= 7) category = 'Vừa';
-      else if (totalScore >= 4) category = 'Nhẹ';
-      else category = 'Bình thường';
+    } catch (error) {
+      console.warn('Failed to submit test', error);
+    } finally {
+      setIsSubmitting(false);
     }
-
-    navigation.navigate('Result', {
-      testId,
-      totalScore,
-      category,
-    });
   };
 
   return (
@@ -143,14 +153,14 @@ export default function QuestionScreen() {
         <TouchableOpacity
           style={[
             styles.navButtonPrimary,
-            !isOptionSelected && styles.navButtonPrimaryDisabled
+            (!isOptionSelected || isSubmitting) && styles.navButtonPrimaryDisabled
           ]}
           onPress={handleNext}
-          disabled={!isOptionSelected}
+          disabled={!isOptionSelected || isSubmitting}
           activeOpacity={0.8}
         >
           <Text style={styles.navButtonPrimaryText}>
-            {currentIndex === totalQuestions - 1 ? 'Nộp bài' : 'Tiếp'}
+            {isSubmitting ? 'Đang nộp...' : currentIndex === totalQuestions - 1 ? 'Nộp bài' : 'Tiếp'}
           </Text>
         </TouchableOpacity>
       </View>

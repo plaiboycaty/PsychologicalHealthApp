@@ -89,6 +89,10 @@ const testController = {
       let category = '';
       if (test_id === 1) {
         category = scoring.evaluateZungAnxiety(totalScore);
+      } else if (test_id === 2) {
+        category = scoring.evaluateYMRS(totalScore);
+      } else if (test_id === 3) {
+        category = scoring.evaluateBeckDepression(totalScore);
       } else {
         category = 'Chưa xác định mức độ';
       }
@@ -132,7 +136,7 @@ const testController = {
       const userId = req.user.user_id;
       const userModel = require('../models/userModel');
       const userInfo = await userModel.getUserById(userId);
-      
+
       const userEmail = userInfo.email;
       const userName = userInfo.full_name || 'Một bệnh nhân';
 
@@ -171,9 +175,9 @@ const testController = {
     try {
       const userId = req.user.user_id;
       const latestTest = await testModel.getLatestTestResultByUserId(userId);
-      
+
       if (!latestTest) {
-        return res.status(200).json({ 
+        return res.status(200).json({
           message: 'Người dùng chưa làm bài test nào',
           data: null
         });

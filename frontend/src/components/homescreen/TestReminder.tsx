@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { testApi } from '../../services/testApi';
 
 const mintColor = '#4ABEB2';
@@ -9,6 +9,7 @@ const mintColor = '#4ABEB2';
 export default function TestReminder() {
   const [daysSince, setDaysSince] = useState<number | null>(null);
   const [hasTested, setHasTested] = useState<boolean>(true);
+  const navigation = useNavigation<any>();
 
   useFocusEffect(
     useCallback(() => {
@@ -50,7 +51,9 @@ export default function TestReminder() {
               : `Đã ${daysSince} ngày kể từ lần đánh giá cuối. Làm bài test để theo dõi tiến trình!`
           }
         </Text>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={
+          () => navigation.navigate('Tests')
+        }>
           <Text style={styles.reminderLink}>Làm ngay {'->'}</Text>
         </TouchableOpacity>
       </View>
