@@ -1,25 +1,21 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
   ImageBackground,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../types/navigation.types';
-import { useAuthStore } from '../../store/auth.store';
-import { validateLoginForm } from '../../utils/validators';
 import AuthInput from '../../components/auth/AuthInput';
-import { authApi } from '../../services/authApi';
+import { useLogin } from '../../hooks/useAuth';
 
 type NavigationProp = NativeStackNavigationProp<AuthStackParamList, 'Login'>;
 
@@ -27,46 +23,18 @@ const mintColor = '#66C5BA';
 
 export default function LoginScreen() {
   const navigation = useNavigation<NavigationProp>();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [passwordVisible, setPasswordVisible] = useState(false);
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
-  const [isLoading, setIsLoading] = useState(false);
-  const loginAction = useAuthStore((state) => state.login);
-
-  const handleLogin = async () => {
-    Keyboard.dismiss();
-    const newErrors = validateLoginForm(email, password);
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-    setErrors({});
-    setIsLoading(true);
-
-    try {
-      const response: any = await authApi.login(email, password);
-      // Backend trả về message, token, user
-      loginAction(response.token, response.user);
-    } catch (error: any) {
-      const message = error.response?.data?.message || 'Có lỗi xảy ra, vui lòng thử lại sau.';
-      Alert.alert('Đăng nhập thất bại', message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleGuestLogin = () => {
-    loginAction('guest-token', {
-      id: 0,
-      email: 'guest@app.com',
-      full_name: 'Khách Ẩn Danh',
-      gender: 'Other',
-      dob: '1900-01-01',
-      avatar_url: undefined,
-      treatment_status: 'none',
-    });
-  };
+  const {
+    email,
+    password,
+    passwordVisible,
+    errors,
+    isLoading,
+    changeEmail,
+    changePassword,
+    togglePasswordVisible,
+    handleLogin,
+    handleGuestLogin,
+  } = useLogin();
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -95,10 +63,7 @@ export default function LoginScreen() {
                 keyboardType="email-address"
                 autoCapitalize="none"
                 value={email}
-                onChangeText={(text) => {
-                  setEmail(text);
-                  setErrors({ ...errors, email: undefined });
-                }}
+                onChangeText={changeEmail}
                 error={errors.email}
               />
 
@@ -108,12 +73,9 @@ export default function LoginScreen() {
                 placeholder="Mật khẩu"
                 isPassword
                 passwordVisible={passwordVisible}
-                togglePasswordVisible={() => setPasswordVisible(!passwordVisible)}
+                togglePasswordVisible={togglePasswordVisible}
                 value={password}
-                onChangeText={(text) => {
-                  setPassword(text);
-                  setErrors({ ...errors, password: undefined });
-                }}
+                onChangeText={changePassword}
                 error={errors.password}
               />
 

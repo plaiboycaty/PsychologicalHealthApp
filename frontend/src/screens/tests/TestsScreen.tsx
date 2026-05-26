@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -10,8 +10,7 @@ import {
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { testApi } from '../../services/testApi';
+import { useTests } from '../../hooks/useTests';
 import ConfirmTestModal from '../../components/tests/ConfirmTestModal';
 
 const mintColor = '#4ABEB2';
@@ -33,36 +32,14 @@ const TEST_ASSETS: { [key: number]: any } = {
 };
 
 export default function TestsScreen() {
-  const navigation = useNavigation<any>();
-  const [tests, setTests] = useState<any[]>([]);
-  const [selectedTest, setSelectedTest] = useState<any>(null);
-  const [isModalVisible, setModalVisible] = useState(false);
-
-  useFocusEffect(
-    useCallback(() => {
-      const fetchTests = async () => {
-        try {
-          const response: any = await testApi.getAllTests();
-          if (response && response.tests) {
-            setTests(response.tests);
-          }
-        } catch (error) {
-          console.warn('Failed to load tests', error);
-        }
-      };
-      fetchTests();
-    }, [])
-  );
-
-  const handlePressCard = (test: any) => {
-    setSelectedTest(test);
-    setModalVisible(true);
-  };
-
-  const handleStartTest = (testId: number) => {
-    setModalVisible(false);
-    navigation.navigate('Question', { testId });
-  };
+  const {
+    tests,
+    selectedTest,
+    isModalVisible,
+    handlePressCard,
+    handleStartTest,
+    closeModal,
+  } = useTests();
 
   return (
     <View style={styles.container}>
@@ -111,7 +88,7 @@ export default function TestsScreen() {
           visible={isModalVisible}
           test={selectedTest}
           testAsset={selectedTest ? TEST_ASSETS[selectedTest.id] || TEST_ASSETS[1] : null}
-          onClose={() => setModalVisible(false)}
+          onClose={closeModal}
           onConfirm={handleStartTest}
         />
       </SafeAreaView>

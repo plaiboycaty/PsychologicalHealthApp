@@ -10,8 +10,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
+import { useDiaries } from '../../hooks/useDiaries';
 
 import { MOCK_DIARIES } from '../../constants/mock-data';
 import DiaryCard, { DiaryEntry } from '../../components/diary/DiaryCard';
@@ -39,9 +39,9 @@ function getEntryDate(isoStr: string): string {
 
 export default function DiaryScreen() {
   const [selectedDate, setSelectedDate] = useState<string>(toDateStr(new Date()));
-  const [diaries, setDiaries] = useState<DiaryEntry[]>([]);
-  const [loading, setLoading] = useState(true);
   const [isCalendarVisible, setIsCalendarVisible] = useState(false);
+
+  const { diaries, loading, loadDiaries, addDiary, editDiary, removeDiary } = useDiaries();
 
   // States cho các Modals chi tiết & thêm/sửa
   const [selectedDetailEntry, setSelectedDetailEntry] = useState<DiaryEntry | null>(null);
@@ -50,37 +50,12 @@ export default function DiaryScreen() {
   const [selectedEditorEntry, setSelectedEditorEntry] = useState<DiaryEntry | null>(null);
   const [isEditorVisible, setIsEditorVisible] = useState(false);
 
-  // ---- Đọc dữ liệu từ AsyncStorage khi màn hình nhận focus ----
+  // ---- Đọc dữ liệu từ API khi màn hình nhận focus ----
   useFocusEffect(
     useCallback(() => {
-      const loadDiaries = async () => {
-        try {
-          const stored = await AsyncStorage.getItem(STORAGE_KEY);
-          if (stored !== null) {
-            setDiaries(JSON.parse(stored));
-          } else {
-            // Lần đầu chưa có gì, dùng mock data
-            setDiaries(MOCK_DIARIES);
-            await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(MOCK_DIARIES));
-          }
-        } catch (e) {
-          console.warn('Failed to load diaries from AsyncStorage', e);
-        } finally {
-          setLoading(false);
-        }
-      };
       loadDiaries();
-    }, [])
+    }, [loadDiaries])
   );
-
-  // ---- Lưu dữ liệu xuống AsyncStorage bất cứ khi nào mảng diaries đổi ----
-  const saveDiariesToStorage = async (updatedList: DiaryEntry[]) => {
-    try {
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedList));
-    } catch (e) {
-      console.warn('Failed to save diaries to AsyncStorage', e);
-    }
-  };
 
   // Lọc nhật ký theo ngày đang chọn
   const filteredDiaries = diaries.filter(
@@ -97,14 +72,14 @@ export default function DiaryScreen() {
         {
           text: 'Xoá',
           style: 'destructive',
-          onPress: () => {
-            setDiaries(prev => {
-              const nextList = prev.filter(d => d.id !== id);
-              saveDiariesToStorage(nextList);
-              return nextList;
-            });
-            setIsDetailVisible(false);
-            setSelectedDetailEntry(null);
+          onPress: async () => {
+            try {
+              await removeDiary(id);
+              setIsDetailVisible(false);
+              setSelectedDetailEntry(null);
+            } catch (error) {
+              // Lỗi đã được catch và hiển thị bên trong hook
+            }
           },
         },
       ]
@@ -124,65 +99,29 @@ export default function DiaryScreen() {
   };
 
   // Xử lý Lưu Thêm mới / Chỉnh sửa
-  const handleSaveEntry = (entryData: {
+  const handleSaveEntry = async (entryData: {
     title: string;
     content: string;
     emotion_id: number;
     emotion_name: string;
     image_url: string | null;
   }) => {
-    if (selectedEditorEntry) {
-      // Đang SỬA nhật ký
-      setDiaries(prev => {
-        const nextList = prev.map(item => {
-          if (item.id === selectedEditorEntry.id) {
-            return {
-              ...item,
-              ...entryData,
-            };
-          }
-          return item;
-        });
-        saveDiariesToStorage(nextList);
-        return nextList;
-      });
-      setIsEditorVisible(false);
-      setSelectedEditorEntry(null);
-      // Nếu đang mở xem chi tiết của entry này thì đóng lại luôn để reload thông tin mới
-      setIsDetailVisible(false);
-      setSelectedDetailEntry(null);
-    } else {
-      // Đang THÊM MỚI nhật ký
-      const now = new Date();
-      const [year, month, day] = selectedDate.split('-').map(Number);
-      
-      // Tạo đối tượng Date chứa ngày được chọn và thời gian hiện tại (giờ địa phương)
-      const entryDate = new Date(
-        year,
-        month - 1,
-        day,
-        now.getHours(),
-        now.getMinutes(),
-        now.getSeconds()
-      );
-      const created_at = entryDate.toISOString();
-
-      const newEntry: DiaryEntry = {
-        id: Date.now(), // tạo ID duy nhất dựa trên timestamp
-        title: entryData.title,
-        content: entryData.content,
-        emotion_id: entryData.emotion_id,
-        emotion_name: entryData.emotion_name,
-        image_url: entryData.image_url,
-        created_at,
-      };
-
-      setDiaries(prev => {
-        const nextList = [newEntry, ...prev];
-        saveDiariesToStorage(nextList);
-        return nextList;
-      });
-      setIsEditorVisible(false);
+    try {
+      if (selectedEditorEntry) {
+        // Đang SỬA nhật ký
+        await editDiary(selectedEditorEntry.id, entryData);
+        
+        setIsEditorVisible(false);
+        setSelectedEditorEntry(null);
+        setIsDetailVisible(false);
+        setSelectedDetailEntry(null);
+      } else {
+        // Đang THÊM MỚI nhật ký
+        await addDiary(entryData);
+        setIsEditorVisible(false);
+      }
+    } catch (error) {
+      // Hook đã catch và Alert lỗi, không cần làm gì thêm ở đây
     }
   };
 

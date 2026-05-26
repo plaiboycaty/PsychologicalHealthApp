@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -8,10 +8,9 @@ import {
   StatusBar,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RouteProp, useRoute } from '@react-navigation/native';
 import { AppStackParamList } from '../../types/navigation.types';
-import { testApi } from '../../services/testApi';
+import { useQuestion } from '../../hooks/useQuestion';
 
 // Import subcomponents
 import QuestionHeader from '../../components/tests/QuestionHeader';
@@ -22,38 +21,31 @@ import TestConfirmModal from '../../components/tests/TestConfirmModal';
 const mintColor = '#4ABEB2';
 const bgColor = '#EFEFEF';
 
-type NavigationProp = NativeStackNavigationProp<AppStackParamList, 'Question'>;
 type RouteProps = RouteProp<AppStackParamList, 'Question'>;
 
 export default function QuestionScreen() {
-  const navigation = useNavigation<NavigationProp>();
   const route = useRoute<RouteProps>();
   const { testId } = route.params;
 
-  const [testDetails, setTestDetails] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState<{ [key: number]: number }>({});
-  const [cancelModalVisible, setCancelModalVisible] = useState(false);
-  const [submitModalVisible, setSubmitModalVisible] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  React.useEffect(() => {
-    const fetchTestDetails = async () => {
-      try {
-        const response: any = await testApi.getTestDetail(Number(testId));
-        if (response && response.test) {
-          setTestDetails(response.test);
-        }
-      } catch (error) {
-        console.warn('Failed to fetch test detail', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchTestDetails();
-  }, [testId]);
+  const {
+    testDetails,
+    isLoading,
+    currentIndex,
+    totalQuestions,
+    currentQuestion,
+    selectedOptionId,
+    isOptionSelected,
+    cancelModalVisible,
+    setCancelModalVisible,
+    submitModalVisible,
+    setSubmitModalVisible,
+    isSubmitting,
+    handleSelectOption,
+    handlePrev,
+    handleNext,
+    handleCancelTest,
+    handleSubmitTest,
+  } = useQuestion(Number(testId));
 
   if (isLoading || !testDetails) {
     return (
@@ -62,64 +54,6 @@ export default function QuestionScreen() {
       </View>
     );
   }
-
-  const questions = testDetails.questions;
-  const totalQuestions = questions.length;
-
-  const currentQuestion = questions[currentIndex];
-  const selectedOptionId = answers[currentQuestion.id];
-  const isOptionSelected = selectedOptionId !== undefined;
-
-  const handleSelectOption = (optionId: number) => {
-    setAnswers(prev => ({
-      ...prev,
-      [currentQuestion.id]: optionId,
-    }));
-  };
-
-  const handlePrev = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(prev => prev - 1);
-    }
-  };
-
-  const handleNext = () => {
-    if (currentIndex < totalQuestions - 1) {
-      setCurrentIndex(prev => prev + 1);
-    } else {
-      setSubmitModalVisible(true);
-    }
-  };
-
-  const handleCancelTest = () => {
-    setCancelModalVisible(false);
-    navigation.goBack();
-  };
-
-  const handleSubmitTest = async () => {
-    setSubmitModalVisible(false);
-    setIsSubmitting(true);
-
-    try {
-      const optionIds = Object.values(answers);
-      const response: any = await testApi.submitTest({
-        test_id: Number(testId),
-        option_ids: optionIds
-      });
-
-      if (response && response.result) {
-        navigation.navigate('Result', {
-          testId: String(testId),
-          totalScore: response.result.total_score,
-          category: response.result.category,
-        });
-      }
-    } catch (error) {
-      console.warn('Failed to submit test', error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>

@@ -10,28 +10,20 @@ import {
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RouteProp, useRoute } from '@react-navigation/native';
 import { AppStackParamList } from '../../types/navigation.types';
-import { getResultUIConfig } from '../../utils/testResultHelper';
+import { useResult } from '../../hooks/useResult';
 
 const { width, height } = Dimensions.get('window');
 
-type NavigationProp = NativeStackNavigationProp<AppStackParamList, 'Result'>;
 type RouteProps = RouteProp<AppStackParamList, 'Result'>;
 
 export default function ResultScreen() {
-  const navigation = useNavigation<NavigationProp>();
   const route = useRoute<RouteProps>();
 
   const { totalScore, category, testId } = route.params;
 
-  const testName = Number(testId) === 1 ? 'Lo âu' : Number(testId) === 3 ? 'Trầm cảm' : 'Hưng cảm';
-  const uiConfig = getResultUIConfig(category, testName);
-
-  const handleClose = () => {
-    navigation.navigate('MainTabs');
-  };
+  const { testName, uiConfig, handleClose } = useResult(testId, category);
 
   return (
     <View style={[styles.container, { backgroundColor: uiConfig.color }]}>

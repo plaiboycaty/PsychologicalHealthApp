@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -10,7 +10,6 @@ import {
   ImageBackground,
   StatusBar,
   ScrollView,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -18,10 +17,8 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../types/navigation.types';
 import { Feather } from '@expo/vector-icons';
-import { useAuthStore } from '../../store/auth.store';
-import { validateRegisterForm } from '../../utils/validators';
 import AuthInput from '../../components/auth/AuthInput';
-import { authApi } from '../../services/authApi';
+import { useRegister } from '../../hooks/useAuth';
 
 type NavigationProp = NativeStackNavigationProp<AuthStackParamList, 'Register'>;
 
@@ -30,56 +27,27 @@ const mintColor = '#66C5BA';
 export default function RegisterScreen() {
   const navigation = useNavigation<NavigationProp>();
 
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [gender, setGender] = useState('');
-  const [dob, setDob] = useState('');
-
-  const [passwordVisible, setPasswordVisible] = useState(false);
-  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
-  const [errors, setErrors] = useState<any>({});
-  const [isLoading, setIsLoading] = useState(false);
-
-  const loginAction = useAuthStore((state) => state.login);
-
-  const handleRegister = async () => {
-    Keyboard.dismiss();
-
-    const newErrors = validateRegisterForm(fullName, email, password, confirmPassword, gender, dob);
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-    setErrors({});
-
-    const dobParts = dob.split('/');
-    const apiDob = `${dobParts[2]}-${dobParts[1]}-${dobParts[0]}`;
-
-    setIsLoading(true);
-    try {
-      await authApi.register({
-        full_name: fullName,
-        email,
-        password,
-        gender: gender || 'Other',
-        dob: apiDob,
-      });
-
-      Alert.alert(
-        'Đăng ký thành công',
-        'Tài khoản của bạn đã được tạo. Vui lòng đăng nhập để tiếp tục.',
-        [{ text: 'OK', onPress: () => navigation.goBack() }]
-      );
-    } catch (error: any) {
-      const message = error.response?.data?.message || 'Có lỗi xảy ra, vui lòng thử lại sau.';
-      Alert.alert('Đăng ký thất bại', message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const {
+    fullName,
+    email,
+    password,
+    confirmPassword,
+    gender,
+    dob,
+    passwordVisible,
+    confirmPasswordVisible,
+    errors,
+    isLoading,
+    changeFullName,
+    changeEmail,
+    changePassword,
+    changeConfirmPassword,
+    changeGender,
+    changeDob,
+    togglePasswordVisible,
+    toggleConfirmPasswordVisible,
+    handleRegister,
+  } = useRegister();
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -108,10 +76,7 @@ export default function RegisterScreen() {
                   iconName="user"
                   placeholder="Họ và tên"
                   value={fullName}
-                  onChangeText={(text) => {
-                    setFullName(text);
-                    setErrors({ ...errors, fullName: undefined });
-                  }}
+                  onChangeText={changeFullName}
                   error={errors.fullName}
                 />
 
@@ -122,10 +87,7 @@ export default function RegisterScreen() {
                   keyboardType="email-address"
                   autoCapitalize="none"
                   value={email}
-                  onChangeText={(text) => {
-                    setEmail(text);
-                    setErrors({ ...errors, email: undefined });
-                  }}
+                  onChangeText={changeEmail}
                   error={errors.email}
                 />
 
@@ -135,12 +97,9 @@ export default function RegisterScreen() {
                   placeholder="Mật khẩu"
                   isPassword
                   passwordVisible={passwordVisible}
-                  togglePasswordVisible={() => setPasswordVisible(!passwordVisible)}
+                  togglePasswordVisible={togglePasswordVisible}
                   value={password}
-                  onChangeText={(text) => {
-                    setPassword(text);
-                    setErrors({ ...errors, password: undefined });
-                  }}
+                  onChangeText={changePassword}
                   error={errors.password}
                 />
 
@@ -150,12 +109,9 @@ export default function RegisterScreen() {
                   placeholder="Xác nhận mật khẩu"
                   isPassword
                   passwordVisible={confirmPasswordVisible}
-                  togglePasswordVisible={() => setConfirmPasswordVisible(!confirmPasswordVisible)}
+                  togglePasswordVisible={toggleConfirmPasswordVisible}
                   value={confirmPassword}
-                  onChangeText={(text) => {
-                    setConfirmPassword(text);
-                    setErrors({ ...errors, confirmPassword: undefined });
-                  }}
+                  onChangeText={changeConfirmPassword}
                   error={errors.confirmPassword}
                 />
 
@@ -166,14 +122,14 @@ export default function RegisterScreen() {
 
                   <View style={{ flexDirection: 'row' }}>
                     <TouchableOpacity
-                      onPress={() => { setGender('Male'); setErrors({ ...errors, gender: undefined }); }}
+                      onPress={() => changeGender('Male')}
                       style={[styles.genderOption, gender === 'Male' && styles.genderOptionActive]}
                     >
                       <Text style={[styles.genderText, gender === 'Male' && styles.genderTextActive]}>Nam</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                      onPress={() => { setGender('Female'); setErrors({ ...errors, gender: undefined }); }}
+                      onPress={() => changeGender('Female')}
                       style={[styles.genderOption, gender === 'Female' && styles.genderOptionActive]}
                     >
                       <Text style={[styles.genderText, gender === 'Female' && styles.genderTextActive]}>Nữ</Text>
@@ -187,10 +143,7 @@ export default function RegisterScreen() {
                   iconName="calendar"
                   placeholder="Sinh nhật (DD/MM/YYYY)"
                   value={dob}
-                  onChangeText={(text) => {
-                    setDob(text);
-                    setErrors({ ...errors, dob: undefined });
-                  }}
+                  onChangeText={changeDob}
                   error={errors.dob}
                 />
 

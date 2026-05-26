@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -9,14 +9,11 @@ import {
   ImageBackground,
   Dimensions,
   Platform,
-  Alert
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
-import { useFocusEffect } from '@react-navigation/native';
 import { useAuthStore } from '../../store/auth.store';
-import { diaryApi } from '../../services/diaryApi';
-import { MOCK_DIARIES } from '../../constants/mock-data';
+import { useHome } from '../../hooks/useHome';
 import EmotionModal from '../../components/homescreen/EmotionModal';
 import EmotionTracker from '../../components/homescreen/EmotionTracker';
 import WeeklyCalendar from '../../components/homescreen/WeeklyCalendar';
@@ -26,71 +23,17 @@ const { width } = Dimensions.get('window');
 const mintColor = '#4ABEB2';
 
 export default function HomeScreen() {
-  const [selectedEmotion, setSelectedEmotion] = useState<any>(null);
-  const [isModalVisible, setModalVisible] = useState(false);
-  const [diaries, setDiaries] = useState<any[]>([]);
+  const {
+    diaries,
+    selectedEmotion,
+    isModalVisible,
+    handleSelectEmotion,
+    handleSubmitDiary,
+    closeModal,
+  } = useHome();
 
   // Lấy user từ store
   const user = useAuthStore(state => state.user);
-
-  // Đọc danh sách nhật ký từ API mỗi khi HomeScreen được focus
-  useFocusEffect(
-    useCallback(() => {
-      const loadDiaries = async () => {
-        try {
-          const response: any = await diaryApi.getMyDiaries();
-          if (response && response.data) {
-            setDiaries(response.data);
-          }
-        } catch (e) {
-          console.warn('Failed to load diaries in HomeScreen', e);
-        }
-      };
-      loadDiaries();
-    }, [])
-  );
-
-  const handleSelectEmotion = (emotion: any) => {
-    setSelectedEmotion(emotion);
-    setModalVisible(true);
-  };
-
-  const handleSubmitDiary = async (reason: string) => {
-    if (!selectedEmotion) return;
-
-    try {
-      // Gọi API lưu nhật ký
-      const response: any = await diaryApi.addDiary({
-        emotion_id: selectedEmotion.id,
-        title: 'Nhật ký nhanh',
-        content: reason,
-        image_url: null,
-      });
-
-      // Tạo entry tạm thời để update UI ngay lập tức mà không cần fetch lại
-      const newEntry = {
-        id: response.diary_id || Date.now(),
-        title: 'Nhật ký nhanh',
-        content: reason,
-        emotion_id: selectedEmotion.id,
-        emotion_name: selectedEmotion.name,
-        image_url: null,
-        created_at: new Date().toISOString(),
-      };
-
-      setDiaries([newEntry, ...diaries]);
-
-      Alert.alert('Thành công', 'Nhật ký của cậu đã được lưu lại nhé 🤍');
-    } catch (e) {
-      console.warn('Failed to save quick diary', e);
-      Alert.alert('Lỗi', 'Không thể lưu nhật ký, cậu vui lòng thử lại.');
-    }
-
-    setModalVisible(false);
-    setTimeout(() => {
-      setSelectedEmotion(null);
-    }, 500);
-  };
 
   return (
     // Dùng ImageBackground bọc toàn bộ màn hình
@@ -133,7 +76,7 @@ export default function HomeScreen() {
         <EmotionModal
           visible={isModalVisible}
           emotion={selectedEmotion}
-          onClose={() => setModalVisible(false)}
+          onClose={closeModal}
           onSubmit={handleSubmitDiary}
         />
       </SafeAreaView>
@@ -149,7 +92,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: 'transparent', // iOS: tránh nền trắng đè lên ImageBackground
+    backgroundColor: 'transparent',
   },
   headerContent: {
     flexDirection: 'row',

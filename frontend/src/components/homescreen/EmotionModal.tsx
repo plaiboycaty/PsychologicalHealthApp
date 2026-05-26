@@ -95,7 +95,7 @@ export default function EmotionModal({ visible, emotion, onClose, onSubmit }: Em
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: '#000',
     justifyContent: 'center',
     padding: 20,
   },
