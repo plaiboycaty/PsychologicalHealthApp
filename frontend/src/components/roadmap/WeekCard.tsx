@@ -9,22 +9,29 @@ const ACTIVE_BLUE = '#39BFFF';
 const LOCKED_GRAY = '#C4C4C4';
 
 interface WeekCardProps {
-  week: WeekData;
+  week: any;
   completedTasks: string[];
-  onPress: (week: WeekData) => void;
+  daysElapsed: number;
+  onPress: (week: any) => void;
 }
 
-export default function WeekCard({ week, completedTasks, onPress }: WeekCardProps) {
-  const isLocked = week.status === 'locked';
-  const totalTasks = week.tasks.length;
-  const doneTasks = week.tasks.filter(t => completedTasks.includes(t.taskId)).length;
+export default function WeekCard({ week, completedTasks, daysElapsed, onPress }: WeekCardProps) {
+  const isLocked = daysElapsed < (week.week_number - 1) * 7;
+  
+  // Backend đã parse sẵn và nhét vào thuộc tính tasks rồi
+  const tasks = week.tasks || [];
+
+  const totalTasks = tasks.length;
+  const doneTasks = tasks.filter((t: any) => completedTasks.includes(t.taskId)).length;
   const progress = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
   const isEven = week.week_number % 2 === 0;
+
+  const isCompleted = progress === 100 && totalTasks > 0;
 
   return (
     <TouchableOpacity
       activeOpacity={isLocked ? 1 : 0.8}
-      onPress={() => !isLocked && onPress(week)}
+      onPress={() => !isLocked && onPress({...week, tasks})}
       style={[
         styles.card,
         isLocked ? styles.cardLocked : styles.cardUnlocked,
@@ -35,7 +42,7 @@ export default function WeekCard({ week, completedTasks, onPress }: WeekCardProp
         <View style={[styles.iconCircle, isLocked ? styles.iconCircleLocked : styles.iconCircleUnlocked]}>
           {isLocked ? (
             <Ionicons name="lock-closed" size={18} color="#999" />
-          ) : week.status === 'completed' ? (
+          ) : isCompleted ? (
             <Ionicons name="checkmark" size={20} color="#FFF" />
           ) : (
             <Text style={styles.weekNumberText}>{week.week_number}</Text>

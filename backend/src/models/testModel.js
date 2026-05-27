@@ -52,7 +52,7 @@ const testModel = {
   // Lấy bài test gần nhất của một User
   getLatestTestResultByUserId: async (userId) => {
     const [rows] = await db.query(
-      'SELECT created_at, category FROM test_results WHERE user_id = ? ORDER BY created_at DESC LIMIT 1',
+      'SELECT created_at, category, total_score FROM test_results WHERE user_id = ? ORDER BY created_at DESC LIMIT 1',
       [userId]
     );
     return rows[0] || null;

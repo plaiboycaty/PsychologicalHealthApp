@@ -1,13 +1,27 @@
 const db = require('../config/db');
 
 const treatmentModel = {
-  // 1. Lấy kết quả bài test gần nhất của người dùng
-  getLatestTestCategory: async (userId) => {
+  // 1. Lấy toàn bộ thông tin bài test gần nhất của người dùng
+  getLatestTestResult: async (userId) => {
     const [rows] = await db.query(
-      'SELECT category FROM test_results WHERE user_id = ? ORDER BY created_at DESC LIMIT 1',
+      'SELECT id, category, created_at, completed_tasks, is_roadmap_completed FROM test_results WHERE user_id = ? ORDER BY created_at DESC LIMIT 1',
       [userId]
     );
-    return rows[0] ? rows[0].category : null;
+    if (!rows[0]) return null;
+    
+    let completed = [];
+    try {
+      completed = typeof rows[0].completed_tasks === 'string' 
+        ? JSON.parse(rows[0].completed_tasks) 
+        : (rows[0].completed_tasks || []);
+    } catch (e) {
+      console.error('Lỗi parse completed_tasks từ DB:', e);
+    }
+    
+    return {
+      ...rows[0],
+      completed_tasks: completed
+    };
   },
 
   // 2. Lấy 4 tuần lộ trình tương ứng với hạng mục bệnh đó
@@ -19,38 +33,35 @@ const treatmentModel = {
     return rows;
   },
 
-  // 3. Lấy danh sách các task đã hoàn thành của người dùng
-  getCompletedTasks: async (userId) => {
-    const [rows] = await db.query(
-      'SELECT task_id FROM user_completed_tasks WHERE user_id = ?',
-      [userId]
+  // 3. Bật/Tắt trạng thái hoàn thành của 1 task
+  toggleTask: async (testResultId, taskId, currentTasks) => {
+    let newTasks = [...currentTasks];
+    let status = '';
+
+    if (newTasks.includes(taskId)) {
+      // Đã có -> Xóa đi
+      newTasks = newTasks.filter(id => id !== taskId);
+      status = 'uncompleted';
+    } else {
+      // Chưa có -> Thêm vào
+      newTasks.push(taskId);
+      status = 'completed';
+    }
+
+    await db.query(
+      'UPDATE test_results SET completed_tasks = ? WHERE id = ?',
+      [JSON.stringify(newTasks), testResultId]
     );
-    return rows.map(row => row.task_id);
+
+    return { status, taskId, newTasks };
   },
 
-  // 4. Bật/Tắt trạng thái hoàn thành của 1 task
-  toggleTask: async (userId, taskId) => {
-    // Kiểm tra xem đã hoàn thành chưa
-    const [rows] = await db.query(
-      'SELECT * FROM user_completed_tasks WHERE user_id = ? AND task_id = ?',
-      [userId, taskId]
+  // 4. Cập nhật trạng thái Khóa lộ trình
+  updateRoadmapStatus: async (testResultId, isCompleted) => {
+    await db.query(
+      'UPDATE test_results SET is_roadmap_completed = ? WHERE id = ?',
+      [isCompleted, testResultId]
     );
-    
-    if (rows.length > 0) {
-      // Đã hoàn thành -> Bỏ hoàn thành (Xóa)
-      await db.query(
-        'DELETE FROM user_completed_tasks WHERE user_id = ? AND task_id = ?',
-        [userId, taskId]
-      );
-      return { status: 'uncompleted', taskId };
-    } else {
-      // Chưa hoàn thành -> Đánh dấu hoàn thành (Thêm)
-      await db.query(
-        'INSERT INTO user_completed_tasks (user_id, task_id) VALUES (?, ?)',
-        [userId, taskId]
-      );
-      return { status: 'completed', taskId };
-    }
   }
 };
 

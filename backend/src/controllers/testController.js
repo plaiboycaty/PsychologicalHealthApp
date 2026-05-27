@@ -140,12 +140,16 @@ const testController = {
       const userEmail = userInfo.email;
       const userName = userInfo.full_name || 'Một bệnh nhân';
 
-      // 2. Lấy điểm số từ Body (Frontend gửi lên điểm số hoặc kết quả bài test gần nhất)
-      const { category, score } = req.body;
+      // 2. Lấy điểm số từ Database thay vì tin tưởng req.body từ Frontend
+      const testModel = require('../models/testModel');
+      const latestTest = await testModel.getLatestTestResultByUserId(userId);
 
-      if (!category) {
-        return res.status(400).json({ message: 'Vui lòng cung cấp tình trạng bệnh (category)' });
+      if (!latestTest) {
+        return res.status(404).json({ message: 'Không tìm thấy kết quả bài test của người dùng này' });
       }
+
+      const category = latestTest.category;
+      const score = latestTest.total_score;
 
       // 3. Chuẩn bị nội dung Email
       const doctorEmail = 'mquan8912@gmail.com'; // Email của Bệnh viện/Bác sĩ tiếp nhận

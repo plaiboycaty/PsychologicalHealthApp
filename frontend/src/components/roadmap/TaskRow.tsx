@@ -6,9 +6,14 @@ import {
   StyleSheet,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { TaskItem } from '../../constants/roadmap-mock';
 
 const ACTIVE_BLUE = '#39BFFF';
+
+export interface TaskItem {
+  taskId: string;
+  taskTitle: string;
+  taskDesc: string;
+}
 
 interface TaskRowProps {
   task: TaskItem;
