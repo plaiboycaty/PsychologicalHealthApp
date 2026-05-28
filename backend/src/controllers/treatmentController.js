@@ -32,11 +32,11 @@ const treatmentController = {
         });
       }
 
-      // 3. Xử lý Lộ trình chung (Chung cho cả Lo âu, Trầm cảm, Nghiện Internet...)
+      // 3. Xử lý Lộ trình chung 
       // Dựa vào từ khóa mức độ để bốc lộ trình tương ứng
       let mappedCategory = category;
       const lowerCategory = category.toLowerCase();
-      
+
       if (lowerCategory.includes('nhẹ')) {
         mappedCategory = 'Mức độ nhẹ';
       } else if (lowerCategory.includes('vừa')) {
@@ -56,12 +56,12 @@ const treatmentController = {
         });
       }
 
-      // 4. Tính toán Khóa Thời Gian (Time-Gating) và Trạng thái các Tuần
+      // 4. Tính toán Khóa Thời Gian và Trạng thái các Tuần
       const createdAtDate = new Date(testResult.created_at);
       const now = new Date();
       // Tính số ngày đã trôi qua
       const daysElapsed = Math.floor((now - createdAtDate) / (1000 * 60 * 60 * 24));
-      
+
       const completedTasks = testResult.completed_tasks || [];
       let previousWeekCompleted = true; // Cờ theo dõi tuần trước đã xong chưa
 
@@ -158,10 +158,10 @@ const treatmentController = {
       // Tính thời gian
       const daysElapsed = Math.floor((new Date() - new Date(testResult.created_at)) / (1000 * 60 * 60 * 24));
       const requiredDays = (targetWeek.week_number - 1) * 7;
-      
+
       if (daysElapsed < requiredDays) {
-        return res.status(403).json({ 
-          message: `Cơ thể cần thời gian nghỉ ngơi. Hãy quay lại sau ${requiredDays - daysElapsed} ngày nữa nhé!` 
+        return res.status(403).json({
+          message: `Cơ thể cần thời gian nghỉ ngơi. Hãy quay lại sau ${requiredDays - daysElapsed} ngày nữa nhé!`
         });
       }
 

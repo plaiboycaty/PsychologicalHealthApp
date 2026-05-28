@@ -153,7 +153,7 @@ export default function TaskModal({
 const styles = StyleSheet.create({
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.45)',
+    backgroundColor: '#000000',
   },
   centered: {
     flex: 1,

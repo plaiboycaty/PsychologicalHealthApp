@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -11,29 +11,39 @@ import {
   Platform,
   Dimensions,
   ImageBackground,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
 import { Feather, Ionicons } from '@expo/vector-icons';
+import { usePersonalInfo } from '../../hooks/usePersonalInfo';
 
 const { width } = Dimensions.get('window');
-
 const mintColor = '#66C5BA';
 
 export default function PersonalInfoScreen() {
-  const navigation = useNavigation();
+  const {
+    name,
+    setName,
+    email,
+    gender,
+    setGender,
+    birthday,
+    setBirthday,
+    avatarUri,
+    loading,
+    saving,
+    pickImage,
+    handleSave,
+    navigation,
+  } = usePersonalInfo();
 
-  // State lưu trữ dữ liệu form
-  const [name, setName] = useState('Trần Minh Quân');
-  const [email, setEmail] = useState('mquan8912@gmail.com');
-  const [gender, setGender] = useState('Nam');
-  const [birthday, setBirthday] = useState('14/07/2004');
-
-  const handleSave = () => {
-    // Logic lưu thông tin (sẽ gọi API sau)
-    console.log('Saved:', { name, email, gender, birthday });
-    navigation.goBack();
-  };
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color={mintColor} />
+      </View>
+    );
+  }
 
   return (
     <ImageBackground
@@ -62,12 +72,15 @@ export default function PersonalInfoScreen() {
           >
             {/* 2. Phần Avatar */}
             <View style={styles.avatarContainer}>
-              <View style={styles.avatarWrapper}>
+              <TouchableOpacity style={styles.avatarWrapper} onPress={pickImage}>
                 <Image
-                  source={{ uri: 'https://i.pravatar.cc/150?img=3' }}
+                  source={{ uri: avatarUri || 'https://i.pravatar.cc/150?img=3' }}
                   style={styles.avatar}
                 />
-              </View>
+                <View style={styles.editIconContainer}>
+                  <Ionicons name="camera" size={16} color="#FFF" />
+                </View>
+              </TouchableOpacity>
             </View>
 
             {/* 3. Form Thông Tin */}
@@ -83,14 +96,12 @@ export default function PersonalInfoScreen() {
               </View>
 
               {/* Email */}
-              <View style={styles.inputCard}>
-                <Text style={styles.label}>Email</Text>
+              <View style={[styles.inputCard, { opacity: 0.7 }]}>
+                <Text style={styles.label}>Email (Không thể thay đổi)</Text>
                 <TextInput
                   style={styles.textInput}
                   value={email}
-                  onChangeText={setEmail}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
+                  editable={false}
                 />
               </View>
 
@@ -101,6 +112,7 @@ export default function PersonalInfoScreen() {
                   style={styles.textInput}
                   value={gender}
                   onChangeText={setGender}
+                  placeholder="Nam / Nữ"
                 />
               </View>
 
@@ -111,13 +123,18 @@ export default function PersonalInfoScreen() {
                   style={styles.textInput}
                   value={birthday}
                   onChangeText={setBirthday}
+                  placeholder="DD/MM/YYYY"
                 />
               </View>
             </View>
 
             {/* Nút Lưu */}
-            <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-              <Text style={styles.saveButtonText}>Lưu</Text>
+            <TouchableOpacity style={styles.saveButton} onPress={handleSave} disabled={saving}>
+              {saving ? (
+                <ActivityIndicator color="#FFF" />
+              ) : (
+                <Text style={styles.saveButtonText}>Lưu</Text>
+              )}
             </TouchableOpacity>
 
             <View style={{ height: 40 }} />
@@ -177,6 +194,19 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 65,
     borderWidth: 4,
+    borderColor: '#FFF',
+  },
+  editIconContainer: {
+    position: 'absolute',
+    bottom: 5,
+    right: 5,
+    backgroundColor: mintColor,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
     borderColor: '#FFF',
   },
   formContainer: {

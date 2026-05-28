@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -9,13 +9,15 @@ import {
   ImageBackground,
   Dimensions,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuthStore } from '../../store/auth.store';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AppStackParamList } from '../../types/navigation.types';
+import { userApi, UserProfile } from '../../services/userApi';
 
 const { width } = Dimensions.get('window');
 
@@ -34,6 +36,24 @@ const mintColor = '#66C5BA';
 export default function ProfileScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<AppStackParamList>>();
   const { logout, user } = useAuthStore();
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useFocusEffect(
+    useCallback(() => {
+      const fetchProfile = async () => {
+        try {
+          const data = await userApi.getProfile();
+          setProfile(data);
+        } catch (e) {
+          console.error('Failed to fetch profile', e);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchProfile();
+    }, [])
+  );
 
   const renderIcon = (name: string, type: string) => {
     switch (type) {
@@ -60,13 +80,19 @@ export default function ProfileScreen() {
           {/* PHẦN PROFILE HEADER */}
           <View style={styles.headerContainer}>
             <View style={styles.avatarWrapper}>
-              <Image
-                source={{ uri: 'https://i.pravatar.cc/150?img=3' }}
-                style={styles.avatar}
-              />
+              {loading ? (
+                <View style={[styles.avatar, { justifyContent: 'center', alignItems: 'center', backgroundColor: '#E0E0E0' }]}>
+                  <ActivityIndicator color={mintColor} />
+                </View>
+              ) : (
+                <Image
+                  source={{ uri: profile?.avatar_url || 'https://i.pravatar.cc/150?img=3' }}
+                  style={styles.avatar}
+                />
+              )}
             </View>
-            <Text style={styles.nameText}>{user?.full_name || 'Trần Minh Quân'}</Text>
-            <Text style={styles.emailText}>{user?.email || 'mquan8912@gmail.com'}</Text>
+            <Text style={styles.nameText}>{profile?.full_name || user?.full_name || 'Đang tải...'}</Text>
+            <Text style={styles.emailText}>{profile?.email || user?.email || 'Đang tải...'}</Text>
           </View>
 
           {/* PHẦN DANH SÁCH MENU */}
@@ -78,6 +104,8 @@ export default function ProfileScreen() {
                   onPress={() => {
                     if (item.id === '1') {
                       navigation.navigate('PersonalInfo');
+                    } else if (item.id === '4') {
+                      navigation.navigate('ChangePassword');
                     }
                   }}
                 >

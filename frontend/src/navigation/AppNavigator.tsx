@@ -10,6 +10,7 @@ import HomeScreen from '../screens/home/HomeScreen';
 import TestsScreen from '../screens/tests/TestsScreen';
 import ProfileScreen from '../screens/profile/ProfileScreen';
 import PersonalInfoScreen from '../screens/profile/PersonalInfoScreen';
+import ChangePasswordScreen from '../screens/profile/ChangePasswordScreen';
 import RoadmapScreen from '../screens/roadmap/RoadmapScreen';
 import DiaryScreen from '../screens/diaries/DiaryScreen';
 import QuestionScreen from '../screens/tests/QuestionScreen';
@@ -74,6 +75,7 @@ const AnimatedRoadmap = withTabTransition(RoadmapScreen);
 const AnimatedDiaries = withTabTransition(DiaryScreen);
 const AnimatedProfile = withTabTransition(ProfileScreen);
 const AnimatedPersonalInfo = withTabTransition(PersonalInfoScreen);
+const AnimatedChangePassword = withTabTransition(ChangePasswordScreen);
 const AnimatedQuestion = withTabTransition(QuestionScreen);
 const AnimatedResult = withTabTransition(ResultScreen);
 
@@ -116,6 +118,7 @@ export default function AppNavigator() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="MainTabs" component={TabNavigator} />
       <Stack.Screen name="PersonalInfo" component={AnimatedPersonalInfo} />
+      <Stack.Screen name="ChangePassword" component={AnimatedChangePassword} />
       <Stack.Screen name="Question" component={AnimatedQuestion} />
       <Stack.Screen name="Result" component={AnimatedResult} />
     </Stack.Navigator>

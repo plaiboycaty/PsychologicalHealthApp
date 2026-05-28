@@ -61,7 +61,7 @@ export default function Roadmap52HzScreen() {
 
   const renderHealthy = () => (
     <View style={styles.centerContainer}>
-      <Ionicons name="happy" size={80} color="#FFD166" style={{ marginBottom: 20 }} />
+      <Ionicons name="happy" size={80} color="#39BFFF" style={{ marginBottom: 20 }} />
       <Text style={styles.titleText}>Sức Khỏe Rất Tốt!</Text>
       <Text style={styles.messageText}>
         Tâm lý của bạn đang ở trạng thái hoàn toàn khỏe mạnh. Bạn không cần tham gia lộ trình điều trị nào cả. Hãy tiếp tục duy trì lối sống tích cực nhé!
@@ -86,7 +86,7 @@ export default function Roadmap52HzScreen() {
     // Tính tiến độ: Số tuần đã hoàn thành
     const completedWeeksCount = roadmapData.filter(week => {
       const tasks = week.tasks || [];
-      
+
       const doneTasks = tasks.filter((t: any) => completedTasks.includes(t.taskId)).length;
       return doneTasks === tasks.length && tasks.length > 0;
     }).length;
@@ -169,20 +169,20 @@ const styles = StyleSheet.create({
   titleText: {
     fontSize: 26,
     fontFamily: 'Baloo2_700Bold',
-    color: '#000',
+    color: '#FFF',
     marginBottom: 10,
     textAlign: 'center',
   },
   messageText: {
     fontSize: 16,
     fontFamily: 'Baloo2_500Medium',
-    color: '#555',
+    color: '#FFF',
     textAlign: 'center',
     marginBottom: 30,
     lineHeight: 24,
   },
   actionBtn: {
-    backgroundColor: TEAL_BTN,
+    backgroundColor: ACTIVE_BLUE,
     paddingVertical: 14,
     paddingHorizontal: 28,
     borderRadius: 30,
