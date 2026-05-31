@@ -20,4 +20,5 @@ export type AppStackParamList = {
   ChangePassword: undefined;
   Question: { testId: string };
   Result: { totalScore: number; category: string; testId: string };
+  Statistics: undefined;
 };

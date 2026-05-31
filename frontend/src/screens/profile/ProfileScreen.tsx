@@ -104,6 +104,8 @@ export default function ProfileScreen() {
                   onPress={() => {
                     if (item.id === '1') {
                       navigation.navigate('PersonalInfo');
+                    } else if (item.id === '3') {
+                      navigation.navigate('Statistics');
                     } else if (item.id === '4') {
                       navigation.navigate('ChangePassword');
                     }
