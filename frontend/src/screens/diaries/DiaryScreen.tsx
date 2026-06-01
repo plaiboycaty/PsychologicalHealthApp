@@ -19,6 +19,8 @@ import DatePicker from '../../components/diary/DatePicker';
 import CalendarFilterModal from '../../components/diary/CalendarFilterModal';
 import DiaryDetailModal from '../../components/diary/DiaryDetailModal';
 import DiaryEditorModal from '../../components/diary/DiaryEditorModal';
+import { useAuthStore } from '../../store/auth.store';
+import GuestPlaceholder from '../../components/common/GuestPlaceholder';
 
 const MINT_COLOR = '#4ABEB2';
 const BG_COLOR = '#FFF8F0';
@@ -132,6 +134,12 @@ export default function DiaryScreen() {
       <Text style={styles.emptySubtext}>Hãy ghi lại cảm xúc của mình nhé 💛</Text>
     </View>
   );
+
+  const { user } = useAuthStore();
+
+  if (!user || user.id === 0) {
+    return <GuestPlaceholder featureName="nhật ký cảm xúc" />;
+  }
 
   return (
     <SafeAreaView style={styles.container}>

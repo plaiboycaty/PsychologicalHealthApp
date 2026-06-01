@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useAuthStore } from '../../store/auth.store';
 import { testApi } from '../../services/testApi';
 
 const mintColor = '#4ABEB2';
@@ -10,10 +11,16 @@ export default function TestReminder() {
   const [daysSince, setDaysSince] = useState<number | null>(null);
   const [hasTested, setHasTested] = useState<boolean>(true);
   const navigation = useNavigation<any>();
+  const { user } = useAuthStore();
 
   useFocusEffect(
     useCallback(() => {
       const fetchLatestTest = async () => {
+        // user.id === 0 là tài khoản Khách
+        if (!user || user.id === 0) {
+          setHasTested(false);
+          return;
+        }
         try {
           const response: any = await testApi.getLatestTest();
           if (response && response.data) {
@@ -33,7 +40,7 @@ export default function TestReminder() {
       };
 
       fetchLatestTest();
-    }, [])
+    }, [user])
   );
 
   return (

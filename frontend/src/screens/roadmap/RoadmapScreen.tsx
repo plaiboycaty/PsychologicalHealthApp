@@ -15,6 +15,8 @@ import { Ionicons } from '@expo/vector-icons';
 import WeekCard from '../../components/roadmap/WeekCard';
 import TaskModal from '../../components/roadmap/TaskModal';
 import { useRoadmap } from '../../hooks/useRoadmap';
+import { useAuthStore } from '../../store/auth.store';
+import GuestPlaceholder from '../../components/common/GuestPlaceholder';
 
 const ACTIVE_BLUE = '#39BFFF';
 const TEAL_BTN = '#35979C';
@@ -119,6 +121,8 @@ export default function Roadmap52HzScreen() {
     );
   };
 
+  const { user } = useAuthStore();
+
   const renderContent = () => {
     switch (status) {
       case 'loading': return renderLoading();
@@ -134,6 +138,10 @@ export default function Roadmap52HzScreen() {
       );
     }
   };
+
+  if (!user || user.id === 0) {
+    return <GuestPlaceholder featureName="lộ trình chữa lành" />;
+  }
 
   return (
     <ImageBackground

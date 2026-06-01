@@ -25,7 +25,9 @@ const treatmentController = {
       }
 
       const category = testResult.category;
-      if (category === 'Không lo âu' || category === 'Khỏe mạnh') {
+      const healthyCategories = ['Không lo âu', 'Không có trầm cảm', 'Không có biểu hiện hưng cảm', 'Khỏe mạnh'];
+      
+      if (healthyCategories.includes(category)) {
         return res.status(200).json({
           status: 'healthy',
           message: 'Sức khỏe tâm lý của bạn rất tốt! Bạn không cần lộ trình điều trị.'

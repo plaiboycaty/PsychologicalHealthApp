@@ -18,6 +18,7 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AppStackParamList } from '../../types/navigation.types';
 import { userApi, UserProfile } from '../../services/userApi';
+import GuestPlaceholder from '../../components/common/GuestPlaceholder';
 
 const { width } = Dimensions.get('window');
 
@@ -42,6 +43,10 @@ export default function ProfileScreen() {
   useFocusEffect(
     useCallback(() => {
       const fetchProfile = async () => {
+        if (!user || user.id === 0) {
+          setLoading(false);
+          return;
+        }
         try {
           const data = await userApi.getProfile();
           setProfile(data);
@@ -52,7 +57,7 @@ export default function ProfileScreen() {
         }
       };
       fetchProfile();
-    }, [])
+    }, [user])
   );
 
   const renderIcon = (name: string, type: string) => {
@@ -65,6 +70,10 @@ export default function ProfileScreen() {
         return <Ionicons name={name as any} size={24} color={mintColor} />;
     }
   };
+
+  if (!user || user.id === 0) {
+    return <GuestPlaceholder featureName="hồ sơ cá nhân" />;
+  }
 
   return (
     <ImageBackground

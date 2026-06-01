@@ -3,13 +3,17 @@ import { Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { diaryApi } from '../services/diaryApi';
 
+import { useAuthStore } from '../store/auth.store';
+
 export const useHome = () => {
   const [selectedEmotion, setSelectedEmotion] = useState<any>(null);
   const [isModalVisible, setModalVisible] = useState(false);
   const [diaries, setDiaries] = useState<any[]>([]);
+  const { user } = useAuthStore();
 
   // Đọc danh sách nhật ký từ API mỗi khi HomeScreen được focus
   const loadDiaries = useCallback(async () => {
+    if (!user || user.id === 0) return; // Không gọi API nếu là Khách
     try {
       const response: any = await diaryApi.getMyDiaries();
       if (response && response.data) {
@@ -18,7 +22,7 @@ export const useHome = () => {
     } catch (e) {
       console.warn('Failed to load diaries in HomeScreen', e);
     }
-  }, []);
+  }, [user]);
 
   useFocusEffect(
     useCallback(() => {

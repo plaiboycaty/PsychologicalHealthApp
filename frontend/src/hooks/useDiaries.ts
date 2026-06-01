@@ -2,13 +2,19 @@ import { useState, useCallback } from 'react';
 import { Alert } from 'react-native';
 import { diaryApi } from '../services/diaryApi';
 import { DiaryEntry } from '../components/diary/DiaryCard';
+import { useAuthStore } from '../store/auth.store';
 
 export const useDiaries = () => {
+  const { user } = useAuthStore();
   const [diaries, setDiaries] = useState<DiaryEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Lấy toàn bộ danh sách nhật ký
   const loadDiaries = useCallback(async () => {
+    if (!user || user.id === 0) {
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
       const response: any = await diaryApi.getMyDiaries();
@@ -21,7 +27,7 @@ export const useDiaries = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user]);
 
   // Thêm mới nhật ký
   const addDiary = useCallback(async (entryData: {

@@ -2,9 +2,11 @@ import { useState, useCallback } from 'react';
 import { Alert } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { treatmentApi, RoadmapResponse } from '../services/treatmentApi';
+import { useAuthStore } from '../store/auth.store';
 
 export const useRoadmap = () => {
   const navigation = useNavigation<any>();
+  const { user } = useAuthStore();
 
   const [status, setStatus] = useState<RoadmapResponse['status'] | 'loading'>('loading');
   const [roadmapData, setRoadmapData] = useState<any[]>([]);
@@ -17,6 +19,7 @@ export const useRoadmap = () => {
   const [isSending, setIsSending] = useState(false);
 
   const loadData = useCallback(async () => {
+    if (!user || user.id === 0) return;
     try {
       setStatus('loading');
       const res = await treatmentApi.getMyRoadmap();
@@ -29,7 +32,7 @@ export const useRoadmap = () => {
       console.warn('Failed to load roadmap:', e);
       setStatus('missing_data');
     }
-  }, []);
+  }, [user]);
 
   // Tải lại dữ liệu mỗi khi Tab Lộ trình được focus (để cập nhật kết quả sau khi Test xong)
   useFocusEffect(
