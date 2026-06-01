@@ -194,6 +194,21 @@ const testController = {
     } catch (error) {
       next(error);
     }
+  },
+
+  // GET /api/tests/history
+  getHistory: async (req, res, next) => {
+    try {
+      const userId = req.user.user_id;
+      const history = await testModel.getUserTestHistory(userId);
+
+      res.status(200).json({
+        message: 'Lấy lịch sử làm bài test thành công',
+        data: history
+      });
+    } catch (error) {
+      next(error);
+    }
   }
 };
 

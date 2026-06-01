@@ -10,6 +10,9 @@ router.get('/', testController.getAllTests);
 // Lấy ngày làm bài test gần nhất (Protected - Bắt buộc phải đăng nhập)
 router.get('/latest', authMiddleware, testController.getLatestTest);
 
+// Lấy lịch sử làm bài test (Protected - Bắt buộc phải đăng nhập)
+router.get('/history', authMiddleware, testController.getHistory);
+
 // Lấy thông tin chi tiết một bộ câu hỏi (Public cho Khách xem)
 router.get('/:id', testController.getTestDetail);
 

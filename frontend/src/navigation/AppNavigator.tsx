@@ -16,6 +16,7 @@ import DiaryScreen from '../screens/diaries/DiaryScreen';
 import QuestionScreen from '../screens/tests/QuestionScreen';
 import ResultScreen from '../screens/tests/ResultScreen';
 import StatisticsScreen from '../screens/profile/StatisticsScreen';
+import HistoryScreen from '../screens/profile/HistoryScreen';
 
 const Tab = createBottomTabNavigator<AppTabParamList>();
 const Stack = createNativeStackNavigator<AppStackParamList>();
@@ -80,6 +81,7 @@ const AnimatedChangePassword = withTabTransition(ChangePasswordScreen);
 const AnimatedQuestion = withTabTransition(QuestionScreen);
 const AnimatedResult = withTabTransition(ResultScreen);
 const AnimatedStatistics = withTabTransition(StatisticsScreen);
+const AnimatedHistory = withTabTransition(HistoryScreen);
 
 function TabNavigator() {
   return (
@@ -124,6 +126,7 @@ export default function AppNavigator() {
       <Stack.Screen name="Question" component={AnimatedQuestion} />
       <Stack.Screen name="Result" component={AnimatedResult} />
       <Stack.Screen name="Statistics" component={AnimatedStatistics} />
+      <Stack.Screen name="History" component={AnimatedHistory} />
     </Stack.Navigator>
   );
 }

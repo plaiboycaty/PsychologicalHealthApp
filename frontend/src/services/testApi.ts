@@ -17,6 +17,10 @@ export const testApi = {
     return axiosClient.get('/tests/latest');
   },
 
+  getHistory: async () => {
+    return axiosClient.get('/tests/history');
+  },
+
   sendEmergencyEmail: async (data: { category: string; score: number }) => {
     return axiosClient.post('/tests/emergency-email', data);
   }

@@ -56,6 +56,20 @@ const testModel = {
       [userId]
     );
     return rows[0] || null;
+  },
+
+  // Lấy toàn bộ lịch sử bài test của User
+  getUserTestHistory: async (userId) => {
+    const query = `
+      SELECT 
+        tr.id, tr.test_id, t.name, tr.total_score, tr.category, tr.created_at
+      FROM test_results tr
+      JOIN tests t ON tr.test_id = t.id
+      WHERE tr.user_id = ?
+      ORDER BY tr.created_at DESC
+    `;
+    const [rows] = await db.query(query, [userId]);
+    return rows;
   }
 };
 

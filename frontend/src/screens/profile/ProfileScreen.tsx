@@ -108,6 +108,8 @@ export default function ProfileScreen() {
                       navigation.navigate('Statistics');
                     } else if (item.id === '4') {
                       navigation.navigate('ChangePassword');
+                    } else if (item.id === '5') {
+                      navigation.navigate('History');
                     }
                   }}
                 >

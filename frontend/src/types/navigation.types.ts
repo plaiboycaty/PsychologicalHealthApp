@@ -21,4 +21,5 @@ export type AppStackParamList = {
   Question: { testId: string };
   Result: { totalScore: number; category: string; testId: string };
   Statistics: undefined;
+  History: undefined;
 };
