@@ -10,4 +10,33 @@ export const Colors = {
   warning: '#F2C94C',
   success: '#27AE60',
   emergency: '#FF3B30',
+
+  mint: '#4ABEB2',
+  mintLight: '#66C5BA',
+  mintBg: '#E8F6F5',
+  mintBgLight: '#EEF8F7',
+  mintBgSoft: '#E6F7F5',
+
+  creamBg: '#FFF8F0',
+  orangeBg: '#FFF5ED',
+  brownPrimary: '#B5977A',
+  brownSecondary: '#8C7C6D',
+  brownLight: '#F0EBE6',
+  brownBorder: '#D9CFC4',
+  shadowColor: '#B0A090',
+
+  grayLight: '#F5F5F5',
+  grayBg: '#FAFAFA',
+  grayInputBg: '#F5F7FA',
+  charcoal: '#2D2D2D',
+  blackText: '#1A1A1A',
+  grayPlaceholder: '#BDBDBD',
+  grayIcon: '#999999',
+  grayBorder: '#CCCCCC',
+  grayDark: '#666666',
+
+  blueAccent: '#39BFFF',
+  redAccent: '#E63946',
+  redLight: '#FF7675',
 };
+

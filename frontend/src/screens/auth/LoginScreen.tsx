@@ -16,10 +16,9 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../types/navigation.types';
 import AuthInput from '../../components/auth/AuthInput';
 import { useLogin } from '../../hooks/useAuth';
+import { Colors } from '../../constants/colors';
 
 type NavigationProp = NativeStackNavigationProp<AuthStackParamList, 'Login'>;
-
-const mintColor = '#66C5BA';
 
 export default function LoginScreen() {
   const navigation = useNavigation<NavigationProp>();
@@ -135,14 +134,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
-    color: '#000',
+    color: Colors.blackText,
     textAlign: 'center',
     marginBottom: 10,
     fontFamily: 'Baloo2_700Bold',
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: Colors.grayDark,
     textAlign: 'center',
     marginBottom: 50,
     fontFamily: 'Baloo2_400Regular',
@@ -158,10 +157,10 @@ const styles = StyleSheet.create({
   },
   inputErrorBorder: {
     borderWidth: 1,
-    borderColor: '#FF7675',
+    borderColor: Colors.redLight,
   },
   errorText: {
-    color: '#FF7675',
+    color: Colors.redLight,
     fontSize: 13,
     marginLeft: 20,
     marginTop: -15,
@@ -173,7 +172,7 @@ const styles = StyleSheet.create({
   textInput: {
     flex: 1,
     fontSize: 16,
-    color: '#333',
+    color: Colors.text,
     fontFamily: 'Baloo2_400Regular',
   },
   eyeIconWrapper: {
@@ -191,18 +190,18 @@ const styles = StyleSheet.create({
     marginBottom: 35,
   },
   forgotPasswordText: {
-    color: '#BDBDBD',
+    color: Colors.grayPlaceholder,
     fontSize: 14,
     fontFamily: 'Baloo2_400Regular',
   },
   loginButton: {
-    backgroundColor: mintColor,
+    backgroundColor: Colors.mintLight,
     borderRadius: 30,
     paddingVertical: 14,
     width: '60%',
     alignSelf: 'center',
     marginBottom: 40,
-    shadowColor: mintColor,
+    shadowColor: Colors.mintLight,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
@@ -219,7 +218,7 @@ const styles = StyleSheet.create({
     marginBottom: 35,
   },
   guestButtonText: {
-    color: mintColor,
+    color: Colors.mintLight,
     fontSize: 16,
     fontFamily: 'Baloo2_700Bold',
     textDecorationLine: 'underline',
@@ -229,12 +228,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   registerText: {
-    color: '#000',
+    color: Colors.blackText,
     fontSize: 16,
     fontFamily: 'Baloo2_400Regular',
   },
   registerLink: {
-    color: '#000',
+    color: Colors.blackText,
     fontSize: 16,
     textDecorationLine: 'underline',
     fontFamily: 'Baloo2_700Bold',

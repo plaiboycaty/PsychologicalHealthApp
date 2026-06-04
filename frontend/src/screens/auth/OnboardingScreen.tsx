@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import {
   View, Text, StyleSheet, FlatList, Image,
-  Dimensions, TouchableOpacity, NativeSyntheticEvent, NativeScrollEvent
+  Dimensions, TouchableOpacity
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -10,8 +10,6 @@ import { MOCK_ONBOARDING } from '../../constants/mock-data';
 import { Colors } from '../../constants/colors';
 
 type NavigationProp = NativeStackNavigationProp<AuthStackParamList, 'Onboarding'>;
-
-const mintColor = '#66C5BA';
 
 export default function OnboardingScreen() {
   const width = Dimensions.get('window').width;
@@ -123,7 +121,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   skipButton: {
-    backgroundColor: mintColor,
+    backgroundColor: Colors.mintLight,
     paddingVertical: 12,
     paddingHorizontal: 40,
     borderRadius: 25,
@@ -146,10 +144,11 @@ const styles = StyleSheet.create({
   },
   activeDot: {
     width: 20,
-    backgroundColor: mintColor,
+    backgroundColor: Colors.mintLight,
   },
   inactiveDot: {
     width: 10,
-    backgroundColor: '#D1D5DB', // Xám nhạt
+    backgroundColor: Colors.border,
   }
 });
+

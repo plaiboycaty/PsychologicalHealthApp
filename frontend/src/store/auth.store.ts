@@ -30,7 +30,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   token: null,
   user: null,
   isAuthenticated: false,
-  isLoading: true, // Mặc định là true khi app vừa mở lên
+  isLoading: true,
 
   login: async (token, user) => {
     // Lưu token vào nơi bảo mật nhất của điện thoại
@@ -50,7 +50,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       if (token) {
         // Tạm thời set token vào store để axiosClient có thể lấy ra gắn vào Header Authorization
         set({ token });
-        
+
         try {
           // Lấy thông tin user bằng token hiện tại
           const response: any = await userApi.getProfile();

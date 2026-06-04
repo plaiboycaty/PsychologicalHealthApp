@@ -19,10 +19,9 @@ import { AuthStackParamList } from '../../types/navigation.types';
 import { Feather } from '@expo/vector-icons';
 import AuthInput from '../../components/auth/AuthInput';
 import { useRegister } from '../../hooks/useAuth';
+import { Colors } from '../../constants/colors';
 
 type NavigationProp = NativeStackNavigationProp<AuthStackParamList, 'Register'>;
-
-const mintColor = '#66C5BA';
 
 export default function RegisterScreen() {
   const navigation = useNavigation<NavigationProp>();
@@ -117,7 +116,7 @@ export default function RegisterScreen() {
 
                 {/* 5. Giới tính */}
                 <View style={[styles.inputWrapper, styles.shadowInput, errors.gender ? styles.inputErrorBorder : null]}>
-                  <Feather name="users" size={20} color="#999" style={styles.inputIcon} />
+                  <Feather name="users" size={20} color={Colors.grayIcon} style={styles.inputIcon} />
                   <Text style={styles.genderLabel}>Giới tính</Text>
 
                   <View style={{ flexDirection: 'row' }}>
@@ -199,13 +198,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
-    color: '#000',
+    color: Colors.blackText,
     textAlign: 'center',
     fontFamily: 'Baloo2_700Bold',
   },
   subtitle: {
     fontSize: 16,
-    color: '#999',
+    color: Colors.grayIcon,
     textAlign: 'center',
     marginBottom: 20,
     fontFamily: 'Baloo2_400Regular',
@@ -221,10 +220,10 @@ const styles = StyleSheet.create({
   },
   inputErrorBorder: {
     borderWidth: 1,
-    borderColor: '#FF7675',
+    borderColor: Colors.redLight,
   },
   errorText: {
-    color: '#FF7675',
+    color: Colors.redLight,
     fontSize: 13,
     marginLeft: 20,
     marginTop: -15,
@@ -237,7 +236,7 @@ const styles = StyleSheet.create({
   genderLabel: {
     flex: 1,
     fontSize: 16,
-    color: '#BDBDBD',
+    color: Colors.grayPlaceholder,
     fontFamily: 'Baloo2_400Regular',
   },
   shadowInput: {
@@ -252,13 +251,13 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 20,
     marginLeft: 8,
-    backgroundColor: '#F5F7FA',
+    backgroundColor: Colors.grayInputBg,
   },
   genderOptionActive: {
-    backgroundColor: '#66C5BA',
+    backgroundColor: Colors.mintLight,
   },
   genderText: {
-    color: '#999',
+    color: Colors.grayIcon,
     fontSize: 14,
     fontFamily: 'Baloo2_700Bold',
   },
@@ -266,14 +265,14 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   registerButton: {
-    backgroundColor: '#66C5BA',
+    backgroundColor: Colors.mintLight,
     borderRadius: 30,
     paddingVertical: 14,
     width: '60%',
     alignSelf: 'center',
     marginTop: 10,
     marginBottom: 30,
-    shadowColor: '#66C5BA',
+    shadowColor: Colors.mintLight,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
@@ -291,14 +290,15 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   loginText: {
-    color: '#000',
+    color: Colors.blackText,
     fontSize: 16,
     fontFamily: 'Baloo2_400Regular',
   },
   loginLink: {
-    color: '#000',
+    color: Colors.blackText,
     fontSize: 16,
     textDecorationLine: 'underline',
     fontFamily: 'Baloo2_700Bold',
   },
 });
+

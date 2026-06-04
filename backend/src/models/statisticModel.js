@@ -12,7 +12,7 @@ const statisticModel = {
       query += ' AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)';
     }
 
-    query += ' ORDER BY created_at ASC'; // Cũ nhất xếp trước, mới nhất xếp sau để vẽ đồ thị đi tới
+    query += ' ORDER BY created_at ASC';
     const [rows] = await db.query(query, [userId]);
     return rows;
   },

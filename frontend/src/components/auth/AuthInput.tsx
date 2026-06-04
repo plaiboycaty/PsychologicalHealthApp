@@ -8,6 +8,7 @@ import {
   TextInputProps,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { Colors } from '../../constants/colors';
 
 interface AuthInputProps extends TextInputProps {
   iconName: keyof typeof Feather.glyphMap;
@@ -35,16 +36,16 @@ export default function AuthInput({
           error ? styles.inputErrorBorder : null,
         ]}
       >
-        <Feather name={iconName as any} size={20} color="#999" style={styles.inputIcon} />
+        <Feather name={iconName as any} size={20} color={Colors.grayIcon} style={styles.inputIcon} />
         <TextInput
           style={[styles.textInput, style]}
-          placeholderTextColor="#BDBDBD"
+          placeholderTextColor={Colors.grayPlaceholder}
           secureTextEntry={isPassword && !passwordVisible}
           {...props}
         />
         {isPassword && togglePasswordVisible && (
           <TouchableOpacity onPress={togglePasswordVisible} style={styles.eyeIconWrapper}>
-            <Feather name={passwordVisible ? 'eye' : 'eye-off'} size={20} color="#999" />
+            <Feather name={passwordVisible ? 'eye' : 'eye-off'} size={20} color={Colors.grayIcon} />
           </TouchableOpacity>
         )}
       </View>
@@ -69,7 +70,7 @@ const styles = StyleSheet.create({
   },
   inputErrorBorder: {
     borderWidth: 1,
-    borderColor: '#FF7675',
+    borderColor: Colors.redLight,
   },
   inputIcon: {
     marginRight: 10,
@@ -77,7 +78,7 @@ const styles = StyleSheet.create({
   textInput: {
     flex: 1,
     fontSize: 16,
-    color: '#333',
+    color: Colors.text,
     fontFamily: 'Baloo2_400Regular',
   },
   eyeIconWrapper: {
@@ -91,7 +92,7 @@ const styles = StyleSheet.create({
     elevation: 15,
   },
   errorText: {
-    color: '#FF7675',
+    color: Colors.redLight,
     fontSize: 13,
     marginLeft: 20,
     marginTop: -10,
@@ -99,3 +100,4 @@ const styles = StyleSheet.create({
     fontFamily: 'Baloo2_400Regular',
   },
 });
+

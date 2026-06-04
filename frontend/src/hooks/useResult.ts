@@ -36,7 +36,7 @@ export const useResult = (testId: string, category: string) => {
     } else if (isTreatment) {
       setShowTreatmentModal(true);
     } else {
-      handleClose(); // Không bệnh -> Về Home
+      handleClose();
     }
   }, [isEmergency, isTreatment, handleClose]);
 
