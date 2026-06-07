@@ -84,7 +84,8 @@ const authController = {
       // 3. Nếu mọi thứ đúng, tiến hành sinh chuỗi JWT (JSON Web Token)
       const payload = {
         user_id: user.id,
-        email: user.email
+        email: user.email,
+        role: user.role || 'user'
       };
       // Token hợp lệ trong thời gian 7 ngày
       const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' });
@@ -100,6 +101,7 @@ const authController = {
           full_name: user.full_name,
           email: user.email,
           avatar_url: user.avatar_url,
+          role: user.role || 'user',
           treatment_status: treatment_status
         }
       });

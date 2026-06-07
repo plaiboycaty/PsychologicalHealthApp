@@ -18,6 +18,7 @@ const testRoutes = require('./routes/testRoutes');
 const userRoutes = require('./routes/userRoutes');
 const statisticRoutes = require('./routes/statisticRoutes');
 const treatmentRoutes = require('./routes/treatmentRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api', diaryRoutes);
@@ -25,6 +26,7 @@ app.use('/api/tests', testRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/statistics', statisticRoutes);
 app.use('/api/roadmap', treatmentRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.get('/', (req, res) => {
   res.json({ message: 'Chào mừng đến với Backend API của Ứng dụng Sức Khỏe Tâm Lý' });
