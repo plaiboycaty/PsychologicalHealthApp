@@ -42,7 +42,7 @@ export const useLogin = () => {
       email: 'guest@app.com',
       full_name: 'Khách Ẩn Danh',
       gender: 'Other',
-      dob: '1900-01-01',
+      dob: '2000-01-01',
       avatar_url: undefined,
       treatment_status: 'none',
     });
