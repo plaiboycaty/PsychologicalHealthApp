@@ -1,11 +1,22 @@
+import { useEffect } from 'react';
 import { ConfigProvider } from 'antd';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import AdminLayout from './components/AdminLayout';
 import Dashboard from './pages/Dashboard';
 import UserManagement from './pages/UserManagement';
 import QuestionManagement from './pages/QuestionManagement';
+import ProtectedRoute from './components/ProtectedRoute';
+import Login from './pages/Login';
+import Report from './pages/Report';
+import { useAuthStore } from './store/authStore';
 
 function App() {
+  const initializeAuth = useAuthStore((state) => state.initialize);
+
+  useEffect(() => {
+    initializeAuth();
+  }, [initializeAuth]);
+
   return (
     <ConfigProvider
       theme={{
@@ -41,12 +52,21 @@ function App() {
     >
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<AdminLayout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="tests" element={<QuestionManagement />} />
-            <Route path="users" element={<UserManagement />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
+          {/* Public Route */}
+          <Route path="/login" element={<Login />} />
+
+          {/* Protected Routes */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/" element={<AdminLayout />}>
+              <Route index element={<Dashboard />} />
+              <Route path="tests" element={<QuestionManagement />} />
+              <Route path="users" element={<UserManagement />} />
+              <Route path="reports" element={<Report />} />
+            </Route>
           </Route>
+
+          {/* Fallback redirect */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
     </ConfigProvider>

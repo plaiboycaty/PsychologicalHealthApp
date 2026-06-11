@@ -110,3 +110,182 @@ body {
   color: #4ABEB2 !important;
 }
 
+/* ==========================================
+   MINIMALIST INPUT OVERRIDES (BORDER BOTTOM ONLY)
+   ========================================== */
+.minimal-input {
+  border: none !important;
+  border-bottom: 2px solid #E5E7EB !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 10px 0 !important;
+  background: transparent !important;
+  font-size: 15px !important;
+  color: #111827 !important;
+  transition: all 0.3s ease !important;
+}
+
+.minimal-input:focus, 
+.minimal-input-focused, 
+.minimal-input:hover {
+  border-bottom-color: #4ABEB2 !important;
+  background: transparent !important;
+}
+
+/* For password affix inputs */
+.minimal-input-affix {
+  border: none !important;
+  border-bottom: 2px solid #E5E7EB !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 10px 0 !important;
+  background: transparent !important;
+  transition: all 0.3s ease !important;
+}
+
+.minimal-input-affix:focus,
+.minimal-input-affix-focused,
+.minimal-input-affix-hover,
+.minimal-input-affix:hover,
+.minimal-input-affix.ant-input-affix-wrapper-focused {
+  border-bottom-color: #4ABEB2 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+.minimal-input-affix .ant-input {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  font-size: 15px !important;
+  color: #111827 !important;
+}
+
+.minimal-input-affix .ant-input:focus {
+  background: transparent !important;
+}
+
+/* For errors, if we want to show red border bottom */
+.minimal-input-error,
+.minimal-input-error.ant-input-affix-wrapper-status-error {
+  border-bottom-color: #FF4D4F !important;
+}
+
+/* ==========================================
+   BRANDING PANEL EFFECT
+   ========================================== */
+.branding-panel {
+  position: relative;
+  background: linear-gradient(135deg, #4ABEB2 0%, #3A928B 100%);
+  overflow: hidden;
+}
+
+/* Noise overlay */
+.branding-panel::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.04;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Soft animated wave glow */
+.branding-glow {
+  position: absolute;
+  top: -20%;
+  left: -20%;
+  width: 140%;
+  height: 140%;
+  background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
+  animation: float-glow 20s infinite alternate ease-in-out;
+  pointer-events: none;
+}
+
+@keyframes float-glow {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    transform: translate(10%, 10%) scale(1.1);
+  }
+}
+
+/* Waves container */
+.wave-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.wave-svg {
+  position: absolute;
+  bottom: 0;
+  width: 200%;
+  height: 100%;
+  fill: rgba(255, 255, 255, 0.06);
+  transform: translate3d(0, 0, 0);
+}
+
+.wave-svg.wave1 {
+  animation: wave-move 25s linear infinite;
+  opacity: 0.1;
+}
+
+.wave-svg.wave2 {
+  animation: wave-move 18s linear infinite;
+  bottom: 10px;
+  opacity: 0.07;
+}
+
+.wave-svg.wave3 {
+  animation: wave-move 12s linear infinite;
+  bottom: 20px;
+  opacity: 0.04;
+}
+
+@keyframes wave-move {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* Primary Login Button Hover */
+.login-btn:hover {
+  background-color: #3A928B !important;
+  box-shadow: 0 6px 20px rgba(74, 190, 178, 0.35) !important;
+  transform: translateY(-1px);
+}
+
+/* Helper Links underneath form */
+.forgot-password-link {
+  color: #6B7280;
+  font-size: 14px;
+  font-family: "Nunito", sans-serif;
+  font-weight: 500;
+}
+
+.forgot-password-link span {
+  color: #4ABEB2;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.forgot-password-link span:hover {
+  text-decoration: underline;
+  color: #3A928B;
+}
+
+
+

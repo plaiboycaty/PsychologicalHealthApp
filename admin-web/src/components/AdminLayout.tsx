@@ -9,9 +9,11 @@ import {
   Settings,
   Search,
   LogOut,
-  User as UserIcon
+  User as UserIcon,
+  BarChart
 } from 'lucide-react';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
+import { useAuthStore } from '../store/authStore';
 
 const { Header, Sider, Content } = Layout;
 
@@ -19,6 +21,11 @@ const AdminLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+
+  const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
+  const adminName = user?.full_name || 'Admin';
+  const avatarInitial = adminName.trim().charAt(0).toUpperCase();
 
   const {
     token: { colorBgContainer, borderRadiusLG, colorBgLayout },
@@ -40,6 +47,11 @@ const AdminLayout: React.FC = () => {
       icon: <Users size={18} />,
       label: 'Quản lý Người dùng',
     },
+    {
+      key: '/reports',
+      icon: <BarChart size={18} />,
+      label: 'Báo cáo và thống kê',
+    },
   ];
 
   const profileMenu = [
@@ -56,6 +68,13 @@ const AdminLayout: React.FC = () => {
     },
   ];
 
+  const handleProfileMenuClick = ({ key }: { key: string }) => {
+    if (key === 'logout') {
+      logout();
+      navigate('/login');
+    }
+  };
+
   return (
     <Layout style={{ minHeight: '100vh', background: colorBgLayout }}>
       <Sider
@@ -63,7 +82,7 @@ const AdminLayout: React.FC = () => {
         collapsible
         collapsed={collapsed}
         theme="light"
-        width={350}
+        width={320}
         style={{
           boxShadow: '4px 0 24px rgba(0, 0, 0, 0.02)',
           borderRight: '1px solid #F0F2F5',
@@ -157,7 +176,7 @@ const AdminLayout: React.FC = () => {
               shape="circle"
               style={{ width: 40, height: 40, backgroundColor: '#F5F6FA', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             />
-            <Dropdown menu={{ items: profileMenu }} placement="bottomRight" arrow>
+            <Dropdown menu={{ items: profileMenu, onClick: handleProfileMenuClick }} placement="bottomRight" arrow>
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -170,9 +189,9 @@ const AdminLayout: React.FC = () => {
                 marginLeft: 8,
                 transition: 'all 0.3s'
               }}>
-                <Avatar style={{ backgroundColor: '#4ABEB2', fontWeight: 'bold' }}>AQ</Avatar>
+                <Avatar style={{ backgroundColor: '#4ABEB2', fontWeight: 'bold' }}>{avatarInitial}</Avatar>
                 <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
-                  <span style={{ fontWeight: 700, fontSize: 13, color: '#2D2D2D' }}>Admin Trần Minh Quân</span>
+                  <span style={{ fontWeight: 700, fontSize: 13, color: '#2D2D2D' }}>{adminName}</span>
                   <span style={{ fontSize: 11, color: '#8C8C8C' }}>Quản trị viên</span>
                 </div>
               </div>

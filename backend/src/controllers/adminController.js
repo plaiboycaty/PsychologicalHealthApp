@@ -84,6 +84,57 @@ const adminController = {
       console.error(`❌ Lỗi xóa bài test ${req.params.id}:`, error);
       res.status(500).json({ message: 'Lỗi server khi xóa bài test', error: error.message });
     }
+  },
+
+  getAllUsers: async (req, res) => {
+    try {
+      const users = await adminModel.getAllUsers();
+      res.status(200).json({
+        message: 'Lấy danh sách người dùng thành công',
+        data: users
+      });
+    } catch (error) {
+      console.error('❌ Lỗi Controller khi lấy danh sách user:', error);
+      res.status(500).json({ message: 'Lỗi server khi lấy danh sách người dùng', error: error.message });
+    }
+  },
+
+  toggleUserStatus: async (req, res) => {
+    try {
+      const userId = req.params.id;
+      const { status } = req.body;
+
+      if (!['active', 'locked'].includes(status)) {
+        return res.status(400).json({ message: 'Trạng thái không hợp lệ' });
+      }
+
+      const isUpdated = await adminModel.updateUserStatus(userId, status);
+
+      if (!isUpdated) {
+        return res.status(404).json({ message: 'Không tìm thấy người dùng' });
+      }
+
+      res.status(200).json({ message: `Cập nhật trạng thái người dùng thành ${status} thành công!` });
+    } catch (error) {
+      console.error(`❌ Lỗi cập nhật trạng thái user ${req.params.id}:`, error);
+      res.status(500).json({ message: 'Lỗi server khi cập nhật trạng thái', error: error.message });
+    }
+  },
+
+  generateReport: async (req, res) => {
+    try {
+      const { startDate, endDate } = req.query;
+      
+      const reportData = await adminModel.getReportData(startDate, endDate);
+      
+      res.status(200).json({
+        message: 'Tạo dữ liệu báo cáo thành công',
+        data: reportData
+      });
+    } catch (error) {
+      console.error('❌ Lỗi Controller khi tạo báo cáo:', error);
+      res.status(500).json({ message: 'Lỗi server khi sinh dữ liệu báo cáo', error: error.message });
+    }
   }
 };
 

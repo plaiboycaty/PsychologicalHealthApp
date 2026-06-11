@@ -34,15 +34,15 @@ const columns = [
     align: 'right' as const,
     render: () => (
       <Space size="middle">
-        <Button 
-          type="text" 
-          icon={<Edit size={16} color="#2F80ED" />} 
+        <Button
+          type="text"
+          icon={<Edit size={16} color="#2F80ED" />}
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#EBF3FE', borderRadius: 8, width: 34, height: 34 }}
         />
-        <Button 
-          type="text" 
-          danger 
-          icon={<Trash2 size={16} />} 
+        <Button
+          type="text"
+          danger
+          icon={<Trash2 size={16} />}
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF1F0', borderRadius: 8, width: 34, height: 34 }}
         />
       </Space>
@@ -75,9 +75,9 @@ const QuestionManagement: React.FC = () => {
         <Title level={3} style={{ margin: 0, color: '#2D2D2D', fontWeight: 800, fontFamily: '"Nunito", sans-serif' }}>
           Quản lý Bộ câu hỏi
         </Title>
-        <Button 
-          type="primary" 
-          icon={<Plus size={16} />} 
+        <Button
+          type="primary"
+          icon={<Plus size={16} />}
           style={{ borderRadius: 10, height: 38, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}
           onClick={() => setIsModalOpen(true)}
         >
@@ -120,11 +120,11 @@ const QuestionManagement: React.FC = () => {
           <Form.Item label={<strong style={{ color: '#434343' }}>Mô tả</strong>} name="description">
             <Input.TextArea rows={3} placeholder="Mô tả mục đích của bài test..." style={{ borderRadius: 8 }} />
           </Form.Item>
-          
-          <div style={{ 
-            background: '#EEF8F7', 
-            padding: 20, 
-            borderRadius: 12, 
+
+          <div style={{
+            background: '#EEF8F7',
+            padding: 20,
+            borderRadius: 12,
             border: '1px dashed #B5E7E2',
             textAlign: 'center',
             color: '#4ABEB2',

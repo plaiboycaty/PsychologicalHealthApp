@@ -148,6 +148,66 @@ const adminModel = {
     } finally {
       connection.release();
     }
+  },
+
+  getAllUsers: async () => {
+    const [rows] = await db.query(
+      `SELECT id, full_name, email, gender, dob, avatar_url, role, status, created_at 
+       FROM users 
+       WHERE role = 'user' 
+       ORDER BY created_at DESC`
+    );
+    return rows;
+  },
+
+  updateUserStatus: async (userId, status) => {
+    const [result] = await db.query(
+      'UPDATE users SET status = ? WHERE id = ?',
+      [status, userId]
+    );
+    return result.affectedRows > 0;
+  },
+
+  getReportData: async (startDate, endDate) => {
+    // Nếu có tham số thời gian, truy vấn theo thời gian
+    const dateQuery = startDate && endDate ? 'AND created_at BETWEEN ? AND ?' : '';
+    const params = startDate && endDate ? [startDate, endDate] : [];
+
+    // Tổng user trong khoảng thời gian
+    const [userRows] = await db.query(
+      `SELECT COUNT(*) AS new_users FROM users WHERE role = "user" ${dateQuery}`,
+      params
+    );
+
+    // Tổng số lượt làm bài test trong khoảng thời gian
+    const [testRows] = await db.query(
+      `SELECT COUNT(*) AS new_tests FROM test_results WHERE 1=1 ${dateQuery.replace('created_at', 'test_date')}`,
+      params
+    );
+
+    // Dữ liệu biểu đồ (Nhóm theo ngày)
+    // Lưu ý: test_results có thể dùng test_date hoặc created_at, giả sử test_results có cột test_date
+    // users có cột created_at
+    const [userChartData] = await db.query(
+      `SELECT DATE(created_at) as date, COUNT(*) as count 
+       FROM users 
+       WHERE role = "user" ${dateQuery} 
+       GROUP BY DATE(created_at) 
+       ORDER BY date ASC`,
+       params
+    );
+
+    // Tổng số all-time để tham chiếu
+    const [allTimeUsers] = await db.query('SELECT COUNT(*) AS total FROM users WHERE role = "user"');
+    const [allTimeTests] = await db.query('SELECT COUNT(*) AS total FROM test_results');
+
+    return {
+      all_time_users: allTimeUsers[0].total,
+      all_time_tests: allTimeTests[0].total,
+      new_users: userRows[0].new_users,
+      new_tests: testRows[0].new_tests,
+      user_chart: userChartData
+    };
   }
 };
 
