@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Row, Col, Card, Typography, message, Skeleton } from 'antd';
+import React from 'react';
+import { Row, Col, Card, Typography, Skeleton } from 'antd';
 import { Users, FileText, CheckCircle, Activity } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
-import apiClient from '../api/client';
+import { useDashboard } from '../hooks/useDashboard';
 
 const { Title } = Typography;
 
@@ -87,25 +87,7 @@ const mockLineData = [
 ];
 
 const Dashboard: React.FC = () => {
-  const [stats, setStats] = useState({ total_users: 0, total_tests_taken: 0 });
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const fetchStats = async () => {
-      setLoading(true);
-      try {
-        const response = await apiClient.get('/dashboard/stats');
-        setStats(response.data.data);
-      } catch (error) {
-        console.error('Failed to fetch stats:', error);
-        message.error('Không thể lấy dữ liệu thống kê từ máy chủ!');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchStats();
-  }, []);
+  const { stats, loading } = useDashboard();
 
   return (
     <div>

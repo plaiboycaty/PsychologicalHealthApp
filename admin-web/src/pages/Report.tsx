@@ -1,85 +1,24 @@
-import React, { useState, useRef } from 'react';
-import { Row, Col, Card, Typography, Form, Select, DatePicker, Button, message, Table } from 'antd';
+import React from 'react';
+import { Row, Col, Card, Typography, Form, Select, DatePicker, Button, Table } from 'antd';
 import { Printer, Download, FileText } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import apiClient from '../api/client';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
+import { useReport } from '../hooks/useReport';
 import dayjs from 'dayjs';
 
 const { Title, Text } = Typography;
 const { RangePicker } = DatePicker;
 
-// Cấu trúc dữ liệu báo cáo
-interface ReportData {
-  all_time_users: number;
-  all_time_tests: number;
-  new_users: number;
-  new_tests: number;
-  user_chart: { date: string; count: number }[];
-}
-
 const Report: React.FC = () => {
-  const [form] = Form.useForm();
-  const [loading, setLoading] = useState(false);
-  const [reportData, setReportData] = useState<ReportData | null>(null);
-  const [dateRangeStr, setDateRangeStr] = useState<string>('');
-  const printRef = useRef<HTMLDivElement>(null);
-
-  const handleGenerateReport = async (values: any) => {
-    const { dates } = values;
-    if (!dates || dates.length !== 2) {
-      message.warning('Vui lòng chọn khoảng thời gian cụ thể!');
-      return;
-    }
-
-    const startDate = dates[0].format('YYYY-MM-DD');
-    const endDate = dates[1].format('YYYY-MM-DD');
-    setDateRangeStr(`${dates[0].format('DD/MM/YYYY')} - ${dates[1].format('DD/MM/YYYY')}`);
-
-    setLoading(true);
-    try {
-      const response = await apiClient.get(`/reports/generate?startDate=${startDate}&endDate=${endDate}`);
-      setReportData(response.data.data);
-      message.success('Tạo báo cáo thành công!');
-    } catch (error) {
-      console.error('Lỗi khi tạo báo cáo:', error);
-      message.error('Không thể tạo báo cáo. Vui lòng thử lại sau!');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleExportPDF = async () => {
-    if (!printRef.current || !reportData) {
-      message.warning('Vui lòng tạo báo cáo trước khi xuất PDF!');
-      return;
-    }
-
-    try {
-      const canvas = await html2canvas(printRef.current, { scale: 2, useCORS: true });
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`Bao_cao_52Hz_${dayjs().format('DDMMYYYY')}.pdf`);
-      message.success('Xuất file PDF thành công!');
-    } catch (error) {
-      console.error('Lỗi xuất PDF:', error);
-      message.error('Không thể xuất file PDF.');
-    }
-  };
-
-  const handlePrint = () => {
-    if (!reportData) {
-      message.warning('Vui lòng tạo báo cáo trước khi in!');
-      return;
-    }
-    window.print();
-  };
+  const {
+    form,
+    loading,
+    reportData,
+    dateRangeStr,
+    printRef,
+    handleGenerateReport,
+    handleExportPDF,
+    handlePrint
+  } = useReport();
 
   // Cấu hình bảng hoạt động trong báo cáo
   const tableColumns = [

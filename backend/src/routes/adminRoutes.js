@@ -7,14 +7,31 @@ const adminController = require('../controllers/adminController');
 router.use(authMiddleware);
 router.use(adminMiddleware);
 
-// [POST] Thêm bộ câu hỏi mới (Hỗ trợ nhập tay và Import Excel)
-router.post('/tests', adminController.createTest);
+// --- 1. QUẢN LÝ BÀI TEST ---
+// Lấy danh sách các bài test
+router.get('/tests', adminController.getAllTests);
 
-// [PUT] Cập nhật bộ câu hỏi
-router.put('/tests/:id', adminController.updateTest);
+// Thêm mới một bài test (chỉ tạo tên và mô tả)
+router.post('/tests', adminController.createTestMetadata);
 
-// [DELETE] Xóa bộ câu hỏi
+// Cập nhật tên và mô tả bài test
+router.put('/tests/:id', adminController.updateTestMetadata);
+
+// Xóa bài test
 router.delete('/tests/:id', adminController.deleteTest);
+
+// --- 1.B QUẢN LÝ CHI TIẾT CÂU HỎI ---
+// Lấy danh sách câu hỏi của 1 bài test
+router.get('/tests/:testId/questions', adminController.getQuestionsByTest);
+
+// Thêm 1 câu hỏi mới (kèm đáp án) vào bài test
+router.post('/questions', adminController.createQuestion);
+
+// Cập nhật 1 câu hỏi và các đáp án của nó
+router.put('/questions/:id', adminController.updateQuestion);
+
+// Xóa 1 câu hỏi
+router.delete('/questions/:id', adminController.deleteQuestion);
 
 // --- 2. THỐNG KÊ (DASHBOARD) ---
 

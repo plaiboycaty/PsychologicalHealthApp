@@ -1,52 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { Table, Tag, Space, Button, Input, Select, Typography, Card, message } from 'antd';
+import React from 'react';
+import { Table, Tag, Space, Button, Input, Select, Typography, Card } from 'antd';
 import { Eye, Lock, Unlock, Search, Filter } from 'lucide-react';
-import apiClient from '../api/client';
 import type { User } from '../types';
+import { useUserManagement } from '../hooks/useUserManagement';
 
 const { Title } = Typography;
 
 const UserManagement: React.FC = () => {
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [searchText, setSearchText] = useState<string>('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-
-  const fetchUsers = async () => {
-    setLoading(true);
-    try {
-      const response = await apiClient.get('/users');
-      setUsers(response.data.data);
-    } catch (error) {
-      console.error('Failed to fetch users:', error);
-      message.error('Lỗi khi tải danh sách người dùng!');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const handleToggleStatus = async (userId: number, currentStatus: string) => {
-    const newStatus = currentStatus === 'active' ? 'locked' : 'active';
-    try {
-      await apiClient.put(`/users/${userId}/status`, { status: newStatus });
-      message.success(`Đã ${newStatus === 'active' ? 'mở khóa' : 'khóa'} tài khoản thành công!`);
-      fetchUsers(); // Tải lại danh sách sau khi cập nhật
-    } catch (error) {
-      console.error('Failed to toggle user status:', error);
-      message.error('Lỗi khi cập nhật trạng thái người dùng!');
-    }
-  };
-
-  const filteredUsers = users.filter((user) => {
-    const matchNameOrEmail = user.full_name.toLowerCase().includes(searchText.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchText.toLowerCase());
-    const matchStatus = statusFilter === 'all' || user.status === statusFilter;
-    return matchNameOrEmail && matchStatus;
-  });
+  const {
+    users,
+    loading,
+    searchText,
+    statusFilter,
+    setSearchText,
+    setStatusFilter,
+    handleToggleStatus
+  } = useUserManagement();
 
   const columns = [
     {
@@ -59,7 +28,7 @@ const UserManagement: React.FC = () => {
       title: 'Họ và tên',
       dataIndex: 'full_name',
       key: 'full_name',
-      render: (text: string) => <span style={{ fontWeight: 600, color: '#2D2D2D' }}>{text}</span>,
+      render: (text: string) => <span style={{ fontWeight: 700, color: '#2D2D2D' }}>{text}</span>,
     },
     {
       title: 'Email',
@@ -67,15 +36,28 @@ const UserManagement: React.FC = () => {
       key: 'email',
     },
     {
-      title: 'Ngày tham gia',
-      dataIndex: 'created_at',
-      key: 'created_at',
-      render: (dateString: string) => new Date(dateString).toLocaleDateString('vi-VN'),
+      title: 'Giới tính',
+      dataIndex: 'gender',
+      key: 'gender',
+      render: (text: string) => {
+        const mapping: Record<string, string> = { Male: 'Nam', Female: 'Nữ', Other: 'Khác' };
+        return mapping[text] || text;
+      },
+    },
+    {
+      title: 'Ngày sinh',
+      dataIndex: 'dob',
+      key: 'dob',
+      render: (text: string) => {
+        if (!text) return '-';
+        const date = new Date(text);
+        return date.toLocaleDateString('vi-VN');
+      },
     },
     {
       title: 'Trạng thái',
-      key: 'status',
       dataIndex: 'status',
+      key: 'status',
       render: (status: string) => {
         const isActive = status === 'active';
         return (
@@ -85,7 +67,7 @@ const UserManagement: React.FC = () => {
             margin: 0,
             backgroundColor: isActive ? '#EEF8F7' : '#FFF1F0',
             color: isActive ? '#4ABEB2' : '#FF4D4F',
-            border: `1px solid ${isActive ? '#B5E7E2' : '#FFA39E'}`,
+            border: 'none',
             fontWeight: 600
           }}>
             {isActive ? 'Hoạt động' : 'Bị khóa'}
@@ -96,6 +78,7 @@ const UserManagement: React.FC = () => {
     {
       title: 'Hành động',
       key: 'action',
+      align: 'right' as const,
       render: (_, record: User) => (
         <Space size="middle">
           <Button
@@ -156,7 +139,7 @@ const UserManagement: React.FC = () => {
 
         <Table
           columns={columns}
-          dataSource={filteredUsers}
+          dataSource={users}
           loading={loading}
           pagination={{ pageSize: 8 }}
           rowKey="id"
