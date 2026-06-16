@@ -34,27 +34,12 @@ const treatmentController = {
         });
       }
 
-      // 3. Xử lý Lộ trình chung 
-      // Dựa vào từ khóa mức độ để bốc lộ trình tương ứng
-      let mappedCategory = category;
-      const lowerCategory = category.toLowerCase();
-
-      if (lowerCategory.includes('nhẹ')) {
-        mappedCategory = 'Mức độ nhẹ';
-      } else if (lowerCategory.includes('vừa')) {
-        mappedCategory = 'Mức độ vừa';
-      } else if (lowerCategory.includes('rất nặng')) {
-        mappedCategory = 'Mức độ rất nặng';
-      } else if (lowerCategory.includes('nặng')) {
-        mappedCategory = 'Mức độ nặng';
-      }
-
-      // 4. Lấy dữ liệu lộ trình từ DB
-      const roadmap = await treatmentModel.getRoadmapByCategory(mappedCategory);
-      if (roadmap.length === 0) {
+      // 3. Lấy dữ liệu lộ trình từ bảng tiến độ (JOIN với treatments)
+      const roadmapProgress = await treatmentModel.getRoadmapProgress(testResult.id);
+      if (roadmapProgress.length === 0) {
         return res.status(404).json({
           status: 'missing_data',
-          message: `Hệ thống chưa có lộ trình cho hạng mục: ${category}`
+          message: `Hệ thống chưa tạo tiến trình cho lộ trình này.`
         });
       }
 
@@ -64,10 +49,10 @@ const treatmentController = {
       // Tính số ngày đã trôi qua
       const daysElapsed = Math.floor((now - createdAtDate) / (1000 * 60 * 60 * 24));
 
-      const completedTasks = testResult.completed_tasks || [];
       let previousWeekCompleted = true; // Cờ theo dõi tuần trước đã xong chưa
+      let allCompletedTasks = []; // Dồn tất cả các task đã xong của các tuần lại để gửi về Frontend
 
-      const formattedRoadmap = roadmap.map(week => {
+      const formattedRoadmap = roadmapProgress.map(week => {
         let parsedTasks = [];
         try {
           parsedTasks = JSON.parse(week.content || '[]');
@@ -75,12 +60,21 @@ const treatmentController = {
           console.error(`Lỗi parse tasks từ DB cho tuần ${week.week_number}:`, e);
         }
 
+        let weekCompletedTasks = [];
+        try {
+          weekCompletedTasks = typeof week.completed_tasks === 'string'
+            ? JSON.parse(week.completed_tasks)
+            : (week.completed_tasks || []);
+        } catch(e) {}
+        
+        allCompletedTasks.push(...weekCompletedTasks);
+
         let weekStatus = 'locked';
         const requiredDays = (week.week_number - 1) * 7;
 
         // Nếu ĐỦ NGÀY và TUẦN TRƯỚC ĐÃ XONG -> Mở khóa
         if (daysElapsed >= requiredDays && previousWeekCompleted) {
-          const isWeekDone = parsedTasks.length > 0 && parsedTasks.every(t => completedTasks.includes(t.taskId));
+          const isWeekDone = parsedTasks.length > 0 && parsedTasks.every(t => weekCompletedTasks.includes(t.taskId));
           if (isWeekDone) {
             weekStatus = 'completed';
           } else {
@@ -93,9 +87,9 @@ const treatmentController = {
         }
 
         return {
-          id: week.id,
+          id: week.treatment_id,
           week_number: week.week_number,
-          category: category,
+          category: week.category,
           title: week.title,
           status: weekStatus,
           tasks: parsedTasks
@@ -108,7 +102,7 @@ const treatmentController = {
         status: isEmergency ? 'emergency' : 'treatment',
         category: category,
         is_emergency: isEmergency,
-        completed_tasks: completedTasks,
+        completed_tasks: allCompletedTasks, // Trả về dạng mảng gộp như trước đây để Frontend không đổi code
         days_elapsed: daysElapsed,
         data: formattedRoadmap
       });
@@ -133,23 +127,21 @@ const treatmentController = {
       if (!testResult) return res.status(404).json({ message: 'Chưa có bài test' });
       if (testResult.is_roadmap_completed) return res.status(400).json({ message: 'Lộ trình này đã kết thúc' });
 
-      const completedTasks = testResult.completed_tasks || [];
-
-      // 2. Validate Time-Gating (Chống gọi API mở khóa sớm)
-      let mappedCategory = testResult.category;
-      const lowerCategory = mappedCategory.toLowerCase();
-      if (lowerCategory.includes('nhẹ')) mappedCategory = 'Mức độ nhẹ';
-      else if (lowerCategory.includes('vừa')) mappedCategory = 'Mức độ vừa';
-      else if (lowerCategory.includes('rất nặng')) mappedCategory = 'Mức độ rất nặng';
-      else if (lowerCategory.includes('nặng')) mappedCategory = 'Mức độ nặng';
-
-      const roadmap = await treatmentModel.getRoadmapByCategory(mappedCategory);
+      // 2. Validate Time-Gating và tìm Tuần chứa Task này
+      const roadmapProgress = await treatmentModel.getRoadmapProgress(testResult.id);
       let targetWeek = null;
       let totalTasksCount = 0;
+      let totalCompletedCount = 0;
 
-      for (const week of roadmap) {
+      for (const week of roadmapProgress) {
         const tasks = JSON.parse(week.content || '[]');
         totalTasksCount += tasks.length;
+        
+        const weekCompletedTasks = typeof week.completed_tasks === 'string'
+            ? JSON.parse(week.completed_tasks)
+            : (week.completed_tasks || []);
+        totalCompletedCount += weekCompletedTasks.length;
+
         if (tasks.some(t => t.taskId === task_id)) {
           targetWeek = week;
         }
@@ -168,12 +160,17 @@ const treatmentController = {
       }
 
       // 3. Thực hiện Toggle
-      const result = await treatmentModel.toggleTask(testResult.id, task_id, completedTasks);
+      const weekCompletedTasks = typeof targetWeek.completed_tasks === 'string'
+        ? JSON.parse(targetWeek.completed_tasks)
+        : (targetWeek.completed_tasks || []);
+
+      const result = await treatmentModel.toggleTask(targetWeek.progress_id, task_id, weekCompletedTasks);
 
       // 4. Kiểm tra xem có phải là Task cuối cùng của toàn bộ lộ trình không
       let isFinishedAll = false;
       if (result.status === 'completed') {
-        if (result.newTasks.length >= totalTasksCount) {
+        // Nếu vừa check xong 1 task, cộng thêm 1 vào tổng số task đã hoàn thành để so sánh
+        if ((totalCompletedCount + 1) >= totalTasksCount) {
           isFinishedAll = true;
           await treatmentModel.updateRoadmapStatus(testResult.id, true);
         }

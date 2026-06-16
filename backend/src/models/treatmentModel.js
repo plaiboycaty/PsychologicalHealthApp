@@ -4,37 +4,34 @@ const treatmentModel = {
   // 1. Lấy toàn bộ thông tin bài test gần nhất của người dùng
   getLatestTestResult: async (userId) => {
     const [rows] = await db.query(
-      'SELECT id, category, created_at, completed_tasks, is_roadmap_completed FROM test_results WHERE user_id = ? ORDER BY created_at DESC LIMIT 1',
+      'SELECT id, category, created_at, is_roadmap_completed FROM test_results WHERE user_id = ? ORDER BY created_at DESC LIMIT 1',
       [userId]
     );
-    if (!rows[0]) return null;
-    
-    let completed = [];
-    try {
-      completed = typeof rows[0].completed_tasks === 'string' 
-        ? JSON.parse(rows[0].completed_tasks) 
-        : (rows[0].completed_tasks || []);
-    } catch (e) {
-      console.error('Lỗi parse completed_tasks từ DB:', e);
-    }
-    
-    return {
-      ...rows[0],
-      completed_tasks: completed
-    };
+    return rows[0] || null;
   },
 
-  // 2. Lấy 4 tuần lộ trình tương ứng với hạng mục bệnh đó
-  getRoadmapByCategory: async (category) => {
-    const [rows] = await db.query(
-      'SELECT id, week_number, title, content FROM treatments WHERE category = ? ORDER BY week_number ASC',
-      [category]
-    );
+  // 2. Lấy Tiến độ Lộ trình của 1 bài test cụ thể (JOIN 2 bảng)
+  getRoadmapProgress: async (testResultId) => {
+    const query = `
+      SELECT 
+        t.id AS treatment_id, 
+        t.week_number, 
+        t.category,
+        t.title, 
+        t.content,
+        utp.id AS progress_id,
+        utp.completed_tasks
+      FROM user_treatment_progress utp
+      JOIN treatments t ON utp.treatment_id = t.id
+      WHERE utp.test_result_id = ?
+      ORDER BY t.week_number ASC
+    `;
+    const [rows] = await db.query(query, [testResultId]);
     return rows;
   },
 
-  // 3. Bật/Tắt trạng thái hoàn thành của 1 task
-  toggleTask: async (testResultId, taskId, currentTasks) => {
+  // 3. Bật/Tắt trạng thái hoàn thành của 1 task trong 1 tuần
+  toggleTask: async (progressId, taskId, currentTasks) => {
     let newTasks = [...currentTasks];
     let status = '';
 
@@ -49,8 +46,8 @@ const treatmentModel = {
     }
 
     await db.query(
-      'UPDATE test_results SET completed_tasks = ? WHERE id = ?',
-      [JSON.stringify(newTasks), testResultId]
+      'UPDATE user_treatment_progress SET completed_tasks = ? WHERE id = ?',
+      [JSON.stringify(newTasks), progressId]
     );
 
     return { status, taskId, newTasks };

@@ -46,7 +46,29 @@ const testModel = {
       'INSERT INTO test_results (user_id, test_id, total_score, category) VALUES (?, ?, ?, ?)',
       [userId, testId, totalScore, category]
     );
-    return result.insertId;
+    const testResultId = result.insertId;
+
+    // Map category để tìm đúng lộ trình
+    let mappedCategory = category;
+    const lowerCategory = category.toLowerCase();
+    if (lowerCategory.includes('nhẹ')) mappedCategory = 'Mức độ nhẹ';
+    else if (lowerCategory.includes('vừa')) mappedCategory = 'Mức độ vừa';
+    else if (lowerCategory.includes('rất nặng')) mappedCategory = 'Mức độ rất nặng';
+    else if (lowerCategory.includes('nặng')) mappedCategory = 'Mức độ nặng';
+
+    // Lấy danh sách các tuần của lộ trình này từ bảng treatments
+    const [treatments] = await db.query('SELECT id FROM treatments WHERE category = ? ORDER BY week_number ASC', [mappedCategory]);
+    
+    // Nếu có lộ trình (không phải Khỏe mạnh), tiến hành tạo 4 dòng tiến độ
+    if (treatments.length > 0) {
+      const values = treatments.map(t => [userId, testResultId, t.id, JSON.stringify([])]);
+      await db.query(
+        'INSERT INTO user_treatment_progress (user_id, test_result_id, treatment_id, completed_tasks) VALUES ?',
+        [values]
+      );
+    }
+
+    return testResultId;
   },
 
   // Lấy bài test gần nhất của một User

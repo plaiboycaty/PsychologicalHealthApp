@@ -46,13 +46,15 @@ export default function Roadmap52HzScreen() {
     </View>
   );
 
-  const renderLocked = (type: 'no_test' | 'completed') => (
+  const renderLocked = (type: 'no_test' | 'completed' | 'missing_data') => (
     <View style={styles.centerContainer}>
       <Ionicons name="lock-closed" size={80} color="#C4C4C4" style={{ marginBottom: 20 }} />
       <Text style={styles.titleText}>Chưa Mở Khóa Lộ Trình</Text>
       <Text style={styles.messageText}>
         {type === 'no_test'
           ? 'Hệ thống cần phân tích tâm lý của bạn trước khi đưa ra phác đồ điều trị phù hợp.'
+          : type === 'missing_data'
+          ? 'Dữ liệu lộ trình của bạn thuộc phiên bản cũ hoặc chưa được đồng bộ. Vui lòng làm một bài Test mới để hệ thống tạo lại lộ trình nhé!'
           : 'Tuyệt vời! Bạn đã hoàn thành Lộ trình 4 tuần. Hãy làm lại bài kiểm tra để chúng tôi đánh giá mức độ phục hồi nhé!'}
       </Text>
       <TouchableOpacity style={styles.actionBtn} onPress={handleGoToTest}>
@@ -128,12 +130,13 @@ export default function Roadmap52HzScreen() {
       case 'loading': return renderLoading();
       case 'no_test': return renderLocked('no_test');
       case 'roadmap_completed_need_test': return renderLocked('completed');
+      case 'missing_data': return renderLocked('missing_data');
       case 'healthy': return renderHealthy();
       case 'emergency': return renderEmergency();
       case 'treatment': return renderTreatment();
       default: return (
         <View style={styles.centerContainer}>
-          <Text style={styles.messageText}>Dữ liệu bị lỗi. Vui lòng thử lại sau.</Text>
+          <Text style={styles.messageText}>Dữ liệu bị lỗi ({status}). Vui lòng thử lại sau.</Text>
         </View>
       );
     }

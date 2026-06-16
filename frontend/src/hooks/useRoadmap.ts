@@ -28,9 +28,13 @@ export const useRoadmap = () => {
       if (res.data) setRoadmapData(res.data);
       if (res.completed_tasks) setCompletedTasks(res.completed_tasks);
       if (res.days_elapsed !== undefined) setDaysElapsed(res.days_elapsed);
-    } catch (e) {
+    } catch (e: any) {
       console.warn('Failed to load roadmap:', e);
-      setStatus('missing_data');
+      if (e.response && e.response.data && e.response.data.status) {
+        setStatus(e.response.data.status);
+      } else {
+        setStatus('missing_data');
+      }
     }
   }, [user]);
 

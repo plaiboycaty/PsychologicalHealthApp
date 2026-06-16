@@ -6,7 +6,7 @@ Hệ thống sử dụng Cơ sở dữ liệu quan hệ (Relational Database) ba
 
 ### Nhóm 1: Quản lý Người dùng & Cảm xúc
 * **`users`**: Lưu thông tin định danh của người dùng 
-(id(Khóa chính), email, password_hash, full_name, gender, dob (ngày sinh), avatar_url, created_at).
+(id(Khóa chính), email, password_hash, full_name, gender, dob (ngày sinh), avatar_url, created_at, status(trạng thái hoạt động), role(Vai trò: 'user', 'admin')).
 * **`emotions`**: Lưu danh mục các biểu tượng cảm xúc để chuẩn hóa dữ liệu thống kê 
 (id(Khóa chính), name, icon_url).
 * **`diaries`**: Lưu trữ các bài viết nhật ký hằng ngày 
@@ -23,9 +23,11 @@ Thiết kế lưu trữ câu hỏi và đáp án độc lập giúp hệ thống
 
 ### Nhóm 3: Lưu trữ Kết quả & Phác đồ
 * **`test_results`**: Lưu lịch sử làm bài (Tổng điểm, Phân loại mức độ), phục vụ vẽ biểu đồ tiến triển.
-(id (Khóa chính), user_id (Khóa ngoại trỏ về `users`), test_id (Khóa ngoại trỏ về `tests`), total_score, category, completed_task (Chứa những task mà mình đã hoàn thành), is_roadmap_completed (true/false - Kiểm tra hoàn thành lộ trình hay chưa)  created_at).
+(id (Khóa chính), user_id (Khóa ngoại trỏ về `users`), test_id (Khóa ngoại trỏ về `tests`), total_score, category, is_roadmap_completed (true/false - Kiểm tra hoàn thành lộ trình hay chưa), created_at).
 * **`treatments`**: Lưu trữ các lộ trình hỗ trợ theo từng tuần, được ánh xạ (map) với kết quả phân loại của người dùng.
 (id (Khóa chính), category (Mức độ bệnh để map với test_results), week_number, title (Tiêu đề tuần), content(Nội dung, Task))
+* **`user_treatment_progress`**: Bảng cầu nối quản lý tiến độ thực hiện lộ trình của người dùng theo từng tuần cụ thể.
+(progress_id (Khóa chính), user_id (Khóa ngoại trỏ về `users`), test_result_id (Khóa ngoại trỏ về `test_results`), treatment_id (Khóa ngoại trỏ về `treatments`), completed_tasks (Mảng JSON các task đã làm trong tuần này), status (Trạng thái tuần), updated_at)
 
 ## 🔗 Mối quan hệ (Relationships)
 * `users` (1) --- (N) `diaries`
@@ -33,3 +35,6 @@ Thiết kế lưu trữ câu hỏi và đáp án độc lập giúp hệ thống
 * `tests` (1) --- (N) `questions`
 * `questions` (1) --- (N) `options`
 * `emotions` (1) --- (N) `diaries`
+* `users` (1) --- (N) `user_treatment_progress`
+* `test_results` (1) --- (N) `user_treatment_progress`
+* `treatments` (1) --- (N) `user_treatment_progress`
