@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { diaryApi } from '../services/diaryApi';
+import { Emotion } from '../types/models';
 
 import { useAuthStore } from '../store/auth.store';
 
@@ -15,7 +16,7 @@ export const useHome = () => {
   const loadDiaries = useCallback(async () => {
     if (!user || user.id === 0) return; // Không gọi API nếu là Khách
     try {
-      const response: any = await diaryApi.getMyDiaries();
+      const response = await diaryApi.getMyDiaries();
       if (response && response.data) {
         setDiaries(response.data);
       }
@@ -30,7 +31,7 @@ export const useHome = () => {
     }, [loadDiaries])
   );
 
-  const handleSelectEmotion = useCallback((emotion: any) => {
+  const handleSelectEmotion = useCallback((emotion: Emotion) => {
     setSelectedEmotion(emotion);
     setModalVisible(true);
   }, []);
@@ -40,7 +41,7 @@ export const useHome = () => {
 
     try {
       // Gọi API lưu nhật ký
-      const response: any = await diaryApi.addDiary({
+      const response = await diaryApi.addDiary({
         emotion_id: selectedEmotion.id,
         title: 'Nhật ký nhanh',
         content: reason,
@@ -49,7 +50,7 @@ export const useHome = () => {
 
       // Tạo entry tạm thời để update UI ngay lập tức mà không cần fetch lại
       const newEntry = {
-        id: response.diary_id || Date.now(),
+        id: response.data?.id || Date.now(),
         title: 'Nhật ký nhanh',
         content: reason,
         emotion_id: selectedEmotion.id,

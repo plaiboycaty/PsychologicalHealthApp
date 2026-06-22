@@ -17,7 +17,7 @@ export const useDiaries = () => {
     }
     try {
       setLoading(true);
-      const response: any = await diaryApi.getMyDiaries();
+      const response = await diaryApi.getMyDiaries();
       if (response && response.data) {
         setDiaries(response.data);
       }

@@ -49,12 +49,9 @@ export const useStatistics = () => {
         statisticsApi.getEmotionStats(filter)
       ]);
 
-      const historyResponse: any = historyRes;
-      const emotionsResponse: any = emotionsRes;
-
-      if (historyResponse && historyResponse.data) {
-        const historyData = historyResponse.data;
-        const formattedScores = historyData.map((item: any) => ({
+      if (historyRes && historyRes.data) {
+        const historyData = historyRes.data;
+        const formattedScores = historyData.map((item) => ({
           value: item.total_score,
           label: formatDateLabel(item.created_at, filter)
         }));
@@ -65,11 +62,11 @@ export const useStatistics = () => {
         setLineData([]);
       }
 
-      if (emotionsResponse && emotionsResponse.data) {
-        const emotionsData = emotionsResponse.data;
-        const totalDiaries = emotionsResponse.total || 1;
+      if (emotionsRes && emotionsRes.data) {
+        const emotionsData = emotionsRes.data;
+        const totalDiaries = emotionsRes.total || 1;
 
-        const formattedEmotions = emotionsData.map((item: any) => {
+        const formattedEmotions = emotionsData.map((item) => {
           const emotionName = (item.name || '').trim();
           return {
             value: Math.round((parseInt(item.count) / totalDiaries) * 100),

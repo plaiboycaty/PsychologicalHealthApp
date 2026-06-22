@@ -6,7 +6,7 @@ import { authApi } from '../services/authApi';
 import { validateLoginForm, validateRegisterForm } from '../utils/validators';
 
 export const useLogin = () => {
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -25,11 +25,12 @@ export const useLogin = () => {
     setIsLoading(true);
 
     try {
-      const response: any = await authApi.login(email, password);
+      const response: { token: string; user: any } = await authApi.login(email, password) as any;
       // Backend trả về message, token, user
       loginAction(response.token, response.user);
-    } catch (error: any) {
-      const message = error.response?.data?.message || 'Có lỗi xảy ra, vui lòng thử lại sau.';
+    } catch (err) {
+      const e = err as any;
+      const message = e.response?.data?.message || 'Có lỗi xảy ra, vui lòng thử lại sau.';
       Alert.alert('Đăng nhập thất bại', message);
     } finally {
       setIsLoading(false);
@@ -45,6 +46,8 @@ export const useLogin = () => {
       dob: '2000-01-01',
       avatar_url: undefined,
       treatment_status: 'none',
+      status: 'active',
+      role: 'guest',
     });
   }, [loginAction]);
 
@@ -77,7 +80,7 @@ export const useLogin = () => {
 };
 
 export const useRegister = () => {
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation();
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -88,7 +91,7 @@ export const useRegister = () => {
 
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
-  const [errors, setErrors] = useState<any>({});
+  const [errors, setErrors] = useState<Record<string, string | undefined>>({});
   const [isLoading, setIsLoading] = useState(false);
 
   const handleRegister = useCallback(async () => {
@@ -120,8 +123,9 @@ export const useRegister = () => {
         'Tài khoản của bạn đã được tạo. Vui lòng đăng nhập để tiếp tục.',
         [{ text: 'OK', onPress: () => navigation.goBack() }]
       );
-    } catch (error: any) {
-      const message = error.response?.data?.message || 'Có lỗi xảy ra, vui lòng thử lại sau.';
+    } catch (err) {
+      const e = err as any;
+      const message = e.response?.data?.message || 'Có lỗi xảy ra, vui lòng thử lại sau.';
       Alert.alert('Đăng ký thất bại', message);
     } finally {
       setIsLoading(false);
@@ -138,32 +142,32 @@ export const useRegister = () => {
 
   const changeFullName = useCallback((text: string) => {
     setFullName(text);
-    setErrors((prev: any) => ({ ...prev, fullName: undefined }));
+    setErrors((prev) => ({ ...prev, fullName: undefined }));
   }, []);
 
   const changeEmail = useCallback((text: string) => {
     setEmail(text);
-    setErrors((prev: any) => ({ ...prev, email: undefined }));
+    setErrors((prev) => ({ ...prev, email: undefined }));
   }, []);
 
   const changePassword = useCallback((text: string) => {
     setPassword(text);
-    setErrors((prev: any) => ({ ...prev, password: undefined }));
+    setErrors((prev) => ({ ...prev, password: undefined }));
   }, []);
 
   const changeConfirmPassword = useCallback((text: string) => {
     setConfirmPassword(text);
-    setErrors((prev: any) => ({ ...prev, confirmPassword: undefined }));
+    setErrors((prev) => ({ ...prev, confirmPassword: undefined }));
   }, []);
 
   const changeGender = useCallback((val: string) => {
     setGender(val);
-    setErrors((prev: any) => ({ ...prev, gender: undefined }));
+    setErrors((prev) => ({ ...prev, gender: undefined }));
   }, []);
 
   const changeDob = useCallback((text: string) => {
     setDob(text);
-    setErrors((prev: any) => ({ ...prev, dob: undefined }));
+    setErrors((prev) => ({ ...prev, dob: undefined }));
   }, []);
 
   return {

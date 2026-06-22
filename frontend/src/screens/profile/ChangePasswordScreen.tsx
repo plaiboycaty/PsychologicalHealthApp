@@ -55,7 +55,8 @@ export default function ChangePasswordScreen() {
       Alert.alert('Thành công', 'Đổi mật khẩu thành công!', [
         { text: 'OK', onPress: () => navigation.goBack() }
       ]);
-    } catch (e: any) {
+    } catch (err) {
+      const e = err as any;
       Alert.alert('Lỗi', e.response?.data?.message || 'Có lỗi xảy ra, vui lòng thử lại!');
     } finally {
       setLoading(false);

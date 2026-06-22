@@ -17,7 +17,7 @@ export const useQuestion = (testId: number) => {
     const fetchTestDetails = async () => {
       try {
         setIsLoading(true);
-        const response: any = await testApi.getTestDetail(Number(testId));
+        const response = await testApi.getTestDetail(Number(testId));
         if (response && response.test) {
           setTestDetails(response.test);
         }
@@ -69,7 +69,7 @@ export const useQuestion = (testId: number) => {
 
     try {
       const optionIds = Object.values(answers);
-      const response: any = await testApi.submitTest({
+      const response = await testApi.submitTest({
         test_id: Number(testId),
         option_ids: optionIds
       });

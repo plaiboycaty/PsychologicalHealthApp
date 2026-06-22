@@ -1,10 +1,8 @@
 import axios from 'axios';
 
 
-// Cấu hình URL mặc định của Backend XAMPP
-// Lưu ý: Chạy trên máy ảo Android (Emulator), localhost của máy tính phải được gọi bằng IP: 10.0.2.2
-// Test trên điện thoại thật chung mạng Wifi, thay bằng IP máy tính (VD: 192.168.1.x)
-const BASE_URL = 'http://192.168.100.42:3000/api';
+
+const BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://192.168.100.42:3000/api';
 
 const axiosClient = axios.create({
   baseURL: BASE_URL,

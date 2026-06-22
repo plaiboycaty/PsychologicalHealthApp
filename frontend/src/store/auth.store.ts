@@ -4,26 +4,18 @@ import { userApi } from '../services/userApi';
 
 const TOKEN_KEY = 'auth_token';
 
-interface UserProfile {
-  id: number;
-  full_name: string;
-  email: string;
-  gender: string;
-  dob: string;
-  avatar_url?: string;
-  treatment_status?: string;
-}
+import { User } from '../types/models';
 
 interface AuthState {
   token: string | null;
-  user: UserProfile | null;
+  user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
 
-  login: (token: string, user: UserProfile) => Promise<void>;
+  login: (token: string, user: User) => Promise<void>;
   logout: () => Promise<void>;
   restoreToken: () => Promise<void>;
-  updateUser: (user: Partial<UserProfile>) => void;
+  updateUser: (user: Partial<User>) => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -53,9 +45,9 @@ export const useAuthStore = create<AuthState>((set) => ({
 
         try {
           // Lấy thông tin user bằng token hiện tại
-          const response: any = await userApi.getProfile();
+          const userProfile = await userApi.getProfile();
           // Nếu thành công, set user profile và đổi trạng thái
-          set({ user: response.data, isAuthenticated: true, isLoading: false });
+          set({ user: userProfile as unknown as User, isAuthenticated: true, isLoading: false });
         } catch (apiError) {
           // Token có thể đã hết hạn hoặc không hợp lệ, xóa token và đưa về trạng thái chưa đăng nhập
           await SecureStore.deleteItemAsync(TOKEN_KEY);

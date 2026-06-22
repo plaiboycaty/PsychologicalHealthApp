@@ -94,7 +94,7 @@ function TabNavigator() {
         tabBarLabelStyle: { fontSize: 11, fontWeight: 'bold' },
         tabBarStyle: styles.tabBar,
         tabBarIcon: ({ focused, color, size }) => {
-          let iconName: any = 'home';
+          let iconName: keyof typeof Ionicons.glyphMap = "home";
 
           if (route.name === 'Home') iconName = 'home';
           else if (route.name === 'Tests') iconName = 'clipboard';

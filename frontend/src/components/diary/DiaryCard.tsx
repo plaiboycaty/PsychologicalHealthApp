@@ -5,15 +5,9 @@ import { MOCK_EMOTIONS } from '../../constants/mock-data';
 
 const MINT_COLOR = '#4ABEB2';
 
-export type DiaryEntry = {
-  id: number;
-  title: string;
-  content: string;
-  emotion_id: number;
-  emotion_name: string;
-  image_url: string | null;
-  created_at: string;
-};
+import { Diary } from '../../types/models';
+
+export type DiaryEntry = Diary;
 
 interface DiaryCardProps {
   item: DiaryEntry;

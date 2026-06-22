@@ -19,7 +19,7 @@ export const useHistory = () => {
   const fetchHistory = async () => {
     setLoading(true);
     try {
-      const response: any = await testApi.getHistory();
+      const response = await testApi.getHistory();
       if (response && response.data) {
         setHistory(response.data);
       }

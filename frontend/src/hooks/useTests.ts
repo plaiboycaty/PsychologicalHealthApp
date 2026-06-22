@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { testApi } from '../services/testApi';
+import { Test } from '../types/models';
 
 export const useTests = () => {
   const navigation = useNavigation<any>();
@@ -10,7 +11,7 @@ export const useTests = () => {
 
   const fetchTests = useCallback(async () => {
     try {
-      const response: any = await testApi.getAllTests();
+      const response = await testApi.getAllTests();
       if (response && response.tests) {
         setTests(response.tests);
       }
@@ -25,7 +26,7 @@ export const useTests = () => {
     }, [fetchTests])
   );
 
-  const handlePressCard = useCallback((test: any) => {
+  const handlePressCard = useCallback((test: Test) => {
     setSelectedTest(test);
     setModalVisible(true);
   }, []);

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { RoadmapWeek, RoadmapTask } from '../../types/models';
 import { WeekData } from '../../constants/roadmap-mock';
 
 const { width } = Dimensions.get('window');
@@ -9,10 +10,10 @@ const ACTIVE_BLUE = '#39BFFF';
 const LOCKED_GRAY = '#C4C4C4';
 
 interface WeekCardProps {
-  week: any;
+  week: RoadmapWeek;
   completedTasks: string[];
   daysElapsed: number;
-  onPress: (week: any) => void;
+  onPress: (week: RoadmapWeek) => void;
 }
 
 export default function WeekCard({ week, completedTasks, daysElapsed, onPress }: WeekCardProps) {
@@ -22,7 +23,7 @@ export default function WeekCard({ week, completedTasks, daysElapsed, onPress }:
   const tasks = week.tasks || [];
 
   const totalTasks = tasks.length;
-  const doneTasks = tasks.filter((t: any) => completedTasks.includes(t.taskId)).length;
+  const doneTasks = tasks.filter((t: RoadmapTask) => completedTasks.includes(t.taskId)).length;
   const progress = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
   const isEven = week.week_number % 2 === 0;
 

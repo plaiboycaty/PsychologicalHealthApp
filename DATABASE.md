@@ -27,7 +27,7 @@ Thiết kế lưu trữ câu hỏi và đáp án độc lập giúp hệ thống
 * **`treatments`**: Lưu trữ các lộ trình hỗ trợ theo từng tuần, được ánh xạ (map) với kết quả phân loại của người dùng.
 (id (Khóa chính), category (Mức độ bệnh để map với test_results), week_number, title (Tiêu đề tuần), content(Nội dung, Task))
 * **`user_treatment_progress`**: Bảng cầu nối quản lý tiến độ thực hiện lộ trình của người dùng theo từng tuần cụ thể.
-(progress_id (Khóa chính), user_id (Khóa ngoại trỏ về `users`), test_result_id (Khóa ngoại trỏ về `test_results`), treatment_id (Khóa ngoại trỏ về `treatments`), completed_tasks (Mảng JSON các task đã làm trong tuần này), status (Trạng thái tuần), updated_at)
+(progress_id (Khóa chính), user_id (Khóa ngoại trỏ về `users`), test_result_id (Khóa ngoại trỏ về `test_results`), treatment_id (Khóa ngoại trỏ về `treatments`), completed_tasks (Mảng JSON các task đã làm trong tuần này))
 
 ## 🔗 Mối quan hệ (Relationships)
 * `users` (1) --- (N) `diaries`

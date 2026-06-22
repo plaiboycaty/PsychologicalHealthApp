@@ -6,19 +6,21 @@ import {
   TouchableOpacity,
   Modal,
   Image,
-  Dimensions
+  Dimensions,
+  ImageSourcePropType
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { Test } from '../../types/models';
 
 const { width } = Dimensions.get('window');
 const mintColor = '#4ABEB2';
 
 interface ConfirmTestModalProps {
   visible: boolean;
-  test: any;
+  test: Test | null;
   onClose: () => void;
   onConfirm: (testId: number) => void;
-  testAsset?: any;
+  testAsset?: { image: ImageSourcePropType } | null;
 }
 
 export default function ConfirmTestModal({

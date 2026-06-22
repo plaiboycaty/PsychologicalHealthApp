@@ -8,6 +8,7 @@ import {
   Image,
   StatusBar,
   Platform,
+  ImageSourcePropType,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTests } from '../../hooks/useTests';
@@ -16,7 +17,7 @@ import ConfirmTestModal from '../../components/tests/ConfirmTestModal';
 const mintColor = '#4ABEB2';
 
 // Bản đồ tài nguyên tĩnh (Ảnh và màu sắc) ánh xạ theo ID của bài test trên Database
-const TEST_ASSETS: { [key: number]: any } = {
+const TEST_ASSETS: { [key: number]: { image: ImageSourcePropType; color: string; } } = {
   1: {
     image: require('../../../assets/images/test_images/zung.png'),
     color: mintColor,

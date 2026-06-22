@@ -10,6 +10,8 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
+import { RoadmapTask } from '../../types/models';
 import { Ionicons } from '@expo/vector-icons';
 
 import WeekCard from '../../components/roadmap/WeekCard';
@@ -91,7 +93,7 @@ export default function Roadmap52HzScreen() {
     const completedWeeksCount = roadmapData.filter(week => {
       const tasks = week.tasks || [];
 
-      const doneTasks = tasks.filter((t: any) => completedTasks.includes(t.taskId)).length;
+      const doneTasks = tasks.filter((t: RoadmapTask) => completedTasks.includes(t.taskId)).length;
       return doneTasks === tasks.length && tasks.length > 0;
     }).length;
 

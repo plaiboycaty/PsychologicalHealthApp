@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { Alert } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { treatmentApi, RoadmapResponse } from '../services/treatmentApi';
+import { RoadmapWeek } from '../types/models';
 import { useAuthStore } from '../store/auth.store';
 
 export const useRoadmap = () => {
@@ -28,7 +29,8 @@ export const useRoadmap = () => {
       if (res.data) setRoadmapData(res.data);
       if (res.completed_tasks) setCompletedTasks(res.completed_tasks);
       if (res.days_elapsed !== undefined) setDaysElapsed(res.days_elapsed);
-    } catch (e: any) {
+    } catch (err) {
+      const e = err as any;
       console.warn('Failed to load roadmap:', e);
       if (e.response && e.response.data && e.response.data.status) {
         setStatus(e.response.data.status);
@@ -60,14 +62,15 @@ export const useRoadmap = () => {
         loadData(); // Tải lại để chuyển trạng thái sang roadmap_completed_need_test
         setModalVisible(false);
       }
-    } catch (e: any) {
+    } catch (err) {
+      const e = err as any;
       // 3. Rollback nếu lỗi
       Alert.alert('Lỗi', e.response?.data?.message || 'Lỗi kết nối. Vui lòng thử lại!');
       loadData(); // Lấy lại trạng thái chuẩn từ server
     }
   }, [loadData]);
 
-  const handleOpenWeek = useCallback((week: any) => {
+  const handleOpenWeek = useCallback((week: RoadmapWeek) => {
     setSelectedWeek(week);
     setModalVisible(true);
   }, []);
@@ -81,7 +84,8 @@ export const useRoadmap = () => {
     try {
       await treatmentApi.sendEmergencyEmail();
       Alert.alert('Thành công', 'Đã gửi yêu cầu hỗ trợ khẩn cấp tới Bác sĩ!');
-    } catch (e: any) {
+    } catch (err) {
+      const e = err as any;
       Alert.alert('Lỗi', e.response?.data?.message || 'Không thể gửi email lúc này.');
     } finally {
       setIsSending(false);
