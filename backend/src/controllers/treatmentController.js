@@ -1,15 +1,12 @@
 const treatmentModel = require('../models/treatmentModel');
 
 const treatmentController = {
-  // Lấy Lộ trình điều trị dựa trên bài Test gần nhất
   getMyRoadmap: async (req, res, next) => {
     try {
       const userId = req.user.user_id;
 
-      // 1. Lấy kết quả bài test gần nhất
       const testResult = await treatmentModel.getLatestTestResult(userId);
 
-      // 2. Các trạng thái chặn sớm
       if (!testResult) {
         return res.status(404).json({
           status: 'no_test',
@@ -34,7 +31,6 @@ const treatmentController = {
         });
       }
 
-      // 3. Lấy dữ liệu lộ trình từ bảng tiến độ (JOIN với treatments)
       const roadmapProgress = await treatmentModel.getRoadmapProgress(testResult.id);
       if (roadmapProgress.length === 0) {
         return res.status(404).json({
@@ -43,14 +39,12 @@ const treatmentController = {
         });
       }
 
-      // 4. Tính toán Khóa Thời Gian và Trạng thái các Tuần
       const createdAtDate = new Date(testResult.created_at);
       const now = new Date();
-      // Tính số ngày đã trôi qua
       const daysElapsed = Math.floor((now - createdAtDate) / (1000 * 60 * 60 * 24));
 
-      let previousWeekCompleted = true; // Cờ theo dõi tuần trước đã xong chưa
-      let allCompletedTasks = []; // Dồn tất cả các task đã xong của các tuần lại để gửi về Frontend
+      let previousWeekCompleted = true; 
+      let allCompletedTasks = []; 
 
       const formattedRoadmap = roadmapProgress.map(week => {
         let parsedTasks = [];
@@ -72,18 +66,17 @@ const treatmentController = {
         let weekStatus = 'locked';
         const requiredDays = (week.week_number - 1) * 7;
 
-        // Nếu ĐỦ NGÀY và TUẦN TRƯỚC ĐÃ XONG -> Mở khóa
         if (daysElapsed >= requiredDays && previousWeekCompleted) {
           const isWeekDone = parsedTasks.length > 0 && parsedTasks.every(t => weekCompletedTasks.includes(t.taskId));
           if (isWeekDone) {
             weekStatus = 'completed';
           } else {
             weekStatus = 'in_progress';
-            previousWeekCompleted = false; // Chưa xong tuần này thì tuần sau bị khóa
+            previousWeekCompleted = false; 
           }
         } else {
           weekStatus = 'locked';
-          previousWeekCompleted = false; // Cắt đứt chuỗi mở khóa
+          previousWeekCompleted = false; 
         }
 
         return {
@@ -102,7 +95,7 @@ const treatmentController = {
         status: isEmergency ? 'emergency' : 'treatment',
         category: category,
         is_emergency: isEmergency,
-        completed_tasks: allCompletedTasks, // Trả về dạng mảng gộp như trước đây để Frontend không đổi code
+        completed_tasks: allCompletedTasks,
         days_elapsed: daysElapsed,
         data: formattedRoadmap
       });
@@ -112,7 +105,6 @@ const treatmentController = {
     }
   },
 
-  // Đánh dấu hoàn thành / Bỏ hoàn thành một Task
   toggleTaskProgress: async (req, res, next) => {
     try {
       const userId = req.user.user_id;
@@ -122,12 +114,10 @@ const treatmentController = {
         return res.status(400).json({ message: 'Thiếu task_id' });
       }
 
-      // 1. Kiểm tra session hiện tại
       const testResult = await treatmentModel.getLatestTestResult(userId);
       if (!testResult) return res.status(404).json({ message: 'Chưa có bài test' });
       if (testResult.is_roadmap_completed) return res.status(400).json({ message: 'Lộ trình này đã kết thúc' });
 
-      // 2. Validate Time-Gating và tìm Tuần chứa Task này
       const roadmapProgress = await treatmentModel.getRoadmapProgress(testResult.id);
       let targetWeek = null;
       let totalTasksCount = 0;
@@ -149,7 +139,6 @@ const treatmentController = {
 
       if (!targetWeek) return res.status(404).json({ message: 'Task không tồn tại trong lộ trình' });
 
-      // Tính thời gian
       const daysElapsed = Math.floor((new Date() - new Date(testResult.created_at)) / (1000 * 60 * 60 * 24));
       const requiredDays = (targetWeek.week_number - 1) * 7;
 
@@ -159,17 +148,14 @@ const treatmentController = {
         });
       }
 
-      // 3. Thực hiện Toggle
       const weekCompletedTasks = typeof targetWeek.completed_tasks === 'string'
         ? JSON.parse(targetWeek.completed_tasks)
         : (targetWeek.completed_tasks || []);
 
       const result = await treatmentModel.toggleTask(targetWeek.progress_id, task_id, weekCompletedTasks);
 
-      // 4. Kiểm tra xem có phải là Task cuối cùng của toàn bộ lộ trình không
       let isFinishedAll = false;
       if (result.status === 'completed') {
-        // Nếu vừa check xong 1 task, cộng thêm 1 vào tổng số task đã hoàn thành để so sánh
         if ((totalCompletedCount + 1) >= totalTasksCount) {
           isFinishedAll = true;
           await treatmentModel.updateRoadmapStatus(testResult.id, true);

@@ -9,7 +9,6 @@ export const useDiaries = () => {
   const [diaries, setDiaries] = useState<DiaryEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Lấy toàn bộ danh sách nhật ký
   const loadDiaries = useCallback(async () => {
     if (!user || user.id === 0) {
       setLoading(false);
@@ -29,7 +28,6 @@ export const useDiaries = () => {
     }
   }, [user]);
 
-  // Thêm mới nhật ký
   const addDiary = useCallback(async (entryData: {
     title: string;
     content: string;
@@ -44,7 +42,7 @@ export const useDiaries = () => {
         content: entryData.content,
         image_url: entryData.image_url,
       });
-      await loadDiaries(); // Tải lại danh sách sau khi thêm
+      await loadDiaries();
     } catch (error) {
       console.warn('Failed to add diary', error);
       Alert.alert('Lỗi', 'Không thể thêm nhật ký lúc này.');
@@ -52,7 +50,6 @@ export const useDiaries = () => {
     }
   }, [loadDiaries]);
 
-  // Cập nhật nhật ký
   const editDiary = useCallback(async (id: number, entryData: {
     title: string;
     content: string;
@@ -67,7 +64,7 @@ export const useDiaries = () => {
         content: entryData.content,
         image_url: entryData.image_url,
       });
-      await loadDiaries(); // Tải lại danh sách sau khi sửa
+      await loadDiaries();
     } catch (error) {
       console.warn('Failed to edit diary', error);
       Alert.alert('Lỗi', 'Không thể cập nhật nhật ký lúc này.');
@@ -75,11 +72,10 @@ export const useDiaries = () => {
     }
   }, [loadDiaries]);
 
-  // Xoá nhật ký
   const removeDiary = useCallback(async (id: number) => {
     try {
       await diaryApi.removeDiary(id);
-      await loadDiaries(); // Tải lại danh sách sau khi xoá
+      await loadDiaries();
     } catch (error) {
       console.warn('Failed to delete diary', error);
       Alert.alert('Lỗi', 'Không thể xoá nhật ký lúc này.');

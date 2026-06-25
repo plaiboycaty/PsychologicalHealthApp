@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { statisticsApi } from '../services/statisticsApi';
 
-// Định nghĩa màu sắc pastel cho từng loại cảm xúc
 const EMOTION_COLORS: { [key: string]: string } = {
   'Ngạc nhiên': '#F2C94C',
   'Hạnh phúc': '#27AE60',
@@ -34,7 +33,6 @@ export const useStatistics = () => {
       const days = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
       return days[date.getDay()];
     }
-    // For month and all, DD/MM format
     const day = date.getDate().toString().padStart(2, '0');
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     return `${day}/${month}`;
@@ -56,7 +54,6 @@ export const useStatistics = () => {
           label: formatDateLabel(item.created_at, filter)
         }));
 
-        // If there's no data, provide an empty array instead of keeping old data
         setLineData(formattedScores);
       } else {
         setLineData([]);
@@ -82,7 +79,6 @@ export const useStatistics = () => {
 
     } catch (error) {
       console.error('Failed to fetch statistics from API:', error);
-      // Fallback or empty state on error
       setLineData([]);
       setDonutData([]);
     } finally {

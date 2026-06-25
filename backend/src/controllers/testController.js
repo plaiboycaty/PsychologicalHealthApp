@@ -2,7 +2,6 @@ const testModel = require('../models/testModel');
 const scoring = require('../utils/scoring');
 
 const testController = {
-  // GET /api/tests
   getAllTests: async (req, res, next) => {
     try {
       const tests = await testModel.getAllTests();
@@ -15,34 +14,27 @@ const testController = {
     }
   },
 
-  // GET /api/tests/:id
   getTestDetail: async (req, res, next) => {
     try {
       const testId = parseInt(req.params.id);
 
-      // 1. Lấy thông tin bài test
       const testInfo = await testModel.getTestById(testId);
       if (!testInfo) {
         return res.status(404).json({ message: 'Không tìm thấy thông tin bộ câu hỏi này' });
       }
 
-      // 2. Lấy danh sách câu hỏi và đáp án (Dữ liệu phẳng)
       const rawData = await testModel.getQuestionsAndOptions(testId);
 
-      // 3. THUẬT TOÁN GỘP CÂY DỮ LIỆU (NEST OBJECT)
-      // Chuyển hàng chục dòng query thành dạng cấu trúc cha - con để FE gọi map() vẽ UI
       const questionsMap = {};
       rawData.forEach(row => {
-        // Nếu câu hỏi này chưa có trong bộ chứa, thì khởi tạo nó
         if (!questionsMap[row.question_id]) {
           questionsMap[row.question_id] = {
             id: row.question_id,
             content: row.question_content,
             order: row.question_order,
-            options: [] // Khởi tạo mảng rỗng để nhét đáp án vào sau
+            options: []
           };
         }
-        // Sau đó đẩy đáp án vào trong options của câu hỏi đó
         questionsMap[row.question_id].options.push({
           id: row.option_id,
           content: row.option_content,
@@ -50,10 +42,8 @@ const testController = {
         });
       });
 
-      // Chuyển cái bộ chứa (Map) về lại thành Mảng (Array) chuẩn JSON
       const questionsArray = Object.values(questionsMap);
 
-      // 4. Trả về kết quả cho Client
       res.status(200).json({
         message: 'Lấy dữ liệu bài test thành công',
         test: {
@@ -68,10 +58,8 @@ const testController = {
     }
   },
 
-  // POST /api/tests/submit
   submitTest: async (req, res, next) => {
     try {
-      // 1. Kiểm tra xem là Khách hay User có tài khoản
       const userId = req.user ? req.user.user_id : null;
       const isGuest = !userId;
 
@@ -81,11 +69,9 @@ const testController = {
         return res.status(400).json({ message: 'Dữ liệu nộp bài không hợp lệ, mảng đáp án không được trống' });
       }
 
-      // 2. Đưa mảng option_ids qua Model để cộng tổng điểm
       const numericOptionIds = option_ids.map(id => parseInt(id)).filter(id => !isNaN(id));
       const totalScore = await testModel.getOptionsScore(numericOptionIds);
 
-      // 3. Chấm điểm (File utils/scoring.js) 
       let category = '';
       if (test_id === 1) {
         category = scoring.evaluateZungAnxiety(totalScore);
@@ -97,21 +83,18 @@ const testController = {
         category = 'Chưa xác định mức độ';
       }
 
-      // 4. XÁC ĐỊNH MỨC ĐỘ ĐIỀU TRỊ (Treatment Status)
       let treatment_status = 'healthy';
       if (category.includes('nhẹ') || category.includes('vừa')) {
-        treatment_status = 'treatment'; // Cần Modal Lộ trình
+        treatment_status = 'treatment';
       } else if (category.includes('nặng')) {
-        treatment_status = 'emergency'; // Cần Modal Cấp cứu
+        treatment_status = 'emergency';
       }
 
-      // 5. LƯU KẾT QUẢ VÀO DATABASE (CHỈ DÀNH CHO USER ĐÃ ĐĂNG KÝ)
       let resultId = null;
       if (!isGuest) {
         resultId = await testModel.saveTestResult(userId, test_id, totalScore, category);
       }
 
-      // 6. Trả kết quả 
       res.status(isGuest ? 200 : 201).json({
         message: isGuest ? 'Chấm điểm thành công (Chế độ Khách)' : 'Nộp bài test thành công',
         treatment_status: treatment_status,
@@ -129,10 +112,8 @@ const testController = {
     }
   },
 
-  // POST /api/tests/emergency-email
   sendEmergencyEmail: async (req, res, next) => {
     try {
-      // 1. Lấy thông tin bệnh nhân từ Database để đảm bảo chính xác 100%
       const userId = req.user.user_id;
       const userModel = require('../models/userModel');
       const userInfo = await userModel.getUserById(userId);
@@ -140,7 +121,6 @@ const testController = {
       const userEmail = userInfo.email;
       const userName = userInfo.full_name || 'Một bệnh nhân';
 
-      // 2. Lấy điểm số từ Database thay vì tin tưởng req.body từ Frontend
       const testModel = require('../models/testModel');
       const latestTest = await testModel.getLatestTestResultByUserId(userId);
 
@@ -151,15 +131,13 @@ const testController = {
       const category = latestTest.category;
       const score = latestTest.total_score;
 
-      // 3. Chuẩn bị nội dung Email
-      const doctorEmail = 'mquan8912@gmail.com'; // Email của Bệnh viện/Bác sĩ tiếp nhận
+      const doctorEmail = 'mquan8912@gmail.com';
       const subject = `[CẤP CỨU] Yêu cầu hỗ trợ y tế khẩn cấp từ bệnh nhân ${userName}`;
-      const content = `Chào Bác sĩ,\n\nBệnh nhân ${userName} (Email liên hệ: ${userEmail}) vừa thực hiện bài đánh giá tâm lý trên hệ thống và ghi nhận kết quả ở mức báo động.\n\n- Loại bệnh chẩn đoán: ${category}
-      \n- Điểm số: ${score || 'Không xác định'}\n
-      \nKính mong Bệnh viện/Bác sĩ ưu tiên liên hệ và hỗ trợ bệnh nhân này trong thời gian sớm nhất.
-      \n\nTrân trọng,\nHệ thống Cảnh báo - Psychological Health App`;
+      const content = `Chào Bác sĩ,\n\nBệnh nhân ${userName} (Email liên hệ: ${userEmail}) vừa thực hiện bài đánh giá tâm lý trên hệ thống và ghi nhận kết quả ở mức báo động.\n
+      \n- Loại bệnh chẩn đoán: ${category}\n- Điểm số: ${score || 'Không xác định'}\n
+      \nKính mong Bệnh viện/Bác sĩ ưu tiên liên hệ và hỗ trợ bệnh nhân này trong thời gian sớm nhất.\n
+      \nTrân trọng,\nHệ thống Cảnh báo - Psychological Health App`;
 
-      // 4. Gửi Email thông qua Nodemailer
       const mailer = require('../utils/mailer');
       const isSent = await mailer.sendMail(doctorEmail, subject, content);
 
@@ -174,7 +152,6 @@ const testController = {
     }
   },
 
-  // GET /api/tests/latest
   getLatestTest: async (req, res, next) => {
     try {
       const userId = req.user.user_id;
@@ -196,7 +173,6 @@ const testController = {
     }
   },
 
-  // GET /api/tests/history
   getHistory: async (req, res, next) => {
     try {
       const userId = req.user.user_id;

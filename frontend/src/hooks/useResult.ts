@@ -48,7 +48,7 @@ export const useResult = (testId: string, category: string) => {
   const handleCancel = useCallback(() => {
     setShowTreatmentModal(false);
     setShowEmergencyModal(false);
-    handleClose(); // Trở về Home
+    handleClose(); 
   }, [handleClose]);
 
   const handleSendEmergency = useCallback(async () => {

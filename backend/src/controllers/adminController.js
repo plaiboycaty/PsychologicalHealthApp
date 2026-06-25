@@ -1,8 +1,6 @@
 const adminModel = require('../models/adminModel');
 
 const adminController = {
-  // --- 1. QUẢN LÝ VỎ BÀI TEST ---
-
   getAllTests: async (req, res) => {
     try {
       const tests = await adminModel.getAllTests();
@@ -54,8 +52,6 @@ const adminController = {
       res.status(500).json({ message: 'Lỗi server', error: error.message });
     }
   },
-
-  // --- 2. QUẢN LÝ CÂU HỎI CHI TIẾT ---
 
   getQuestionsByTest: async (req, res) => {
     try {

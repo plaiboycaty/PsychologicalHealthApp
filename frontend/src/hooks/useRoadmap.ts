@@ -40,7 +40,6 @@ export const useRoadmap = () => {
     }
   }, [user]);
 
-  // Tải lại dữ liệu mỗi khi Tab Lộ trình được focus (để cập nhật kết quả sau khi Test xong)
   useFocusEffect(
     useCallback(() => {
       loadData();
@@ -48,25 +47,22 @@ export const useRoadmap = () => {
   );
 
   const handleToggleTask = useCallback(async (weekId: number, taskId: string) => {
-    // 1. Optimistic UI update (Cập nhật giao diện trước cho nhanh)
     setCompletedTasks(prev => {
       if (prev.includes(taskId)) return prev.filter(id => id !== taskId);
       return [...prev, taskId];
     });
 
-    // 2. Gọi API ngầm
     try {
       const res = await treatmentApi.toggleTask(taskId);
       if (res.is_finished_all) {
         Alert.alert('Chúc mừng!', 'Bạn đã hoàn thành xuất sắc toàn bộ Lộ trình 4 tuần. Hãy làm bài đánh giá lại để xem sự tiến bộ nhé!');
-        loadData(); // Tải lại để chuyển trạng thái sang roadmap_completed_need_test
+        loadData();
         setModalVisible(false);
       }
     } catch (err) {
       const e = err as any;
-      // 3. Rollback nếu lỗi
       Alert.alert('Lỗi', e.response?.data?.message || 'Lỗi kết nối. Vui lòng thử lại!');
-      loadData(); // Lấy lại trạng thái chuẩn từ server
+      loadData();
     }
   }, [loadData]);
 

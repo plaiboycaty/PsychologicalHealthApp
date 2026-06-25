@@ -4,7 +4,6 @@ import * as ImagePicker from 'expo-image-picker';
 import { useNavigation } from '@react-navigation/native';
 import { userApi } from '../services/userApi';
 
-// Hàm chuyển đổi từ chuỗi ISO của DB (VD: 2004-07-13T17:00:00.000Z) sang DD/MM/YYYY
 const formatDateToDisplay = (isoString: string) => {
   if (!isoString) return '';
   try {
@@ -21,7 +20,6 @@ const formatDateToDisplay = (isoString: string) => {
   }
 };
 
-// Hàm chuyển đổi từ DD/MM/YYYY nhập vào sang YYYY-MM-DD để lưu vào DB MySQL
 const parseDateToSave = (displayDate: string) => {
   if (!displayDate) return undefined;
   const parts = displayDate.split('/');

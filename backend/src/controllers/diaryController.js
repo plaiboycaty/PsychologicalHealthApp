@@ -1,7 +1,6 @@
 const diaryModel = require('../models/diaryModel');
 
 const diaryController = {
-  // GET /api/emotions
   getEmotions: async (req, res, next) => {
     try {
       const emotions = await diaryModel.getAllEmotions();
@@ -14,8 +13,6 @@ const diaryController = {
     }
   },
 
-  // GET /api/diaries 
-  // (Đã qua middleware nên mới có req.user.user_id)
   getMyDiaries: async (req, res, next) => {
     try {
       const userId = req.user.user_id;
@@ -30,7 +27,6 @@ const diaryController = {
     }
   },
 
-  // POST /api/diaries
   addDiary: async (req, res, next) => {
     try {
       const userId = req.user.user_id;
@@ -57,14 +53,12 @@ const diaryController = {
     }
   },
 
-  // PUT /api/diaries/:id
   editDiary: async (req, res, next) => {
     try {
-      const diaryId = req.params.id; // Lấy ID từ trên URL
-      const userId = req.user.user_id; // Ai đang gửi yêu cầu?
+      const diaryId = req.params.id;
+      const userId = req.user.user_id;
       const { emotion_id, title, content, image_url } = req.body;
 
-      // Gọi SQL update
       const affectedRows = await diaryModel.updateDiary(diaryId, userId, {
         emotion_id, title, content, image_url
       });
@@ -79,7 +73,6 @@ const diaryController = {
     }
   },
 
-  // DELETE /api/diaries/:id
   removeDiary: async (req, res, next) => {
     try {
       const diaryId = req.params.id;

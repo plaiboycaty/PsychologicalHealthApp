@@ -12,9 +12,8 @@ export const useHome = () => {
   const [diaries, setDiaries] = useState<any[]>([]);
   const { user } = useAuthStore();
 
-  // Đọc danh sách nhật ký từ API mỗi khi HomeScreen được focus
   const loadDiaries = useCallback(async () => {
-    if (!user || user.id === 0) return; // Không gọi API nếu là Khách
+    if (!user || user.id === 0) return;
     try {
       const response = await diaryApi.getMyDiaries();
       if (response && response.data) {
@@ -40,7 +39,6 @@ export const useHome = () => {
     if (!selectedEmotion) return;
 
     try {
-      // Gọi API lưu nhật ký
       const response = await diaryApi.addDiary({
         emotion_id: selectedEmotion.id,
         title: 'Nhật ký nhanh',
@@ -48,7 +46,6 @@ export const useHome = () => {
         image_url: null,
       });
 
-      // Tạo entry tạm thời để update UI ngay lập tức mà không cần fetch lại
       const newEntry = {
         id: response.data?.id || Date.now(),
         title: 'Nhật ký nhanh',
