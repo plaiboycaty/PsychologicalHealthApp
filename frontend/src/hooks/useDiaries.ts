@@ -35,6 +35,10 @@ export const useDiaries = () => {
     emotion_name: string;
     image_url: string | null;
   }) => {
+    if (!user || user.id === 0) {
+      Alert.alert('Dành cho Thành viên', 'Vui lòng tạo tài khoản để thêm nhật ký nhé! 🤍');
+      return;
+    }
     try {
       await diaryApi.addDiary({
         emotion_id: entryData.emotion_id,
@@ -57,6 +61,10 @@ export const useDiaries = () => {
     emotion_name: string;
     image_url: string | null;
   }) => {
+    if (!user || user.id === 0) {
+      Alert.alert('Dành cho Thành viên', 'Vui lòng tạo tài khoản để sửa nhật ký nhé! 🤍');
+      return;
+    }
     try {
       await diaryApi.editDiary(id, {
         emotion_id: entryData.emotion_id,
@@ -73,6 +81,10 @@ export const useDiaries = () => {
   }, [loadDiaries]);
 
   const removeDiary = useCallback(async (id: number) => {
+    if (!user || user.id === 0) {
+      Alert.alert('Dành cho Thành viên', 'Vui lòng tạo tài khoản để xoá nhật ký nhé! 🤍');
+      return;
+    }
     try {
       await diaryApi.removeDiary(id);
       await loadDiaries();

@@ -37,10 +37,14 @@ export default function StatisticsScreen() {
           onPress={() => navigation.goBack()}
           style={styles.backButton}
         >
-          <Feather name="arrow-left" size={28} color="#000000" />
+          <Feather name="chevron-left" size={28} color="#1A1A2E" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Thống kê</Text>
-        <View style={styles.headerRightPlaceholder} />
+        
+        <View style={styles.headerTitleContainer} pointerEvents="none">
+          <Text style={styles.headerTitle}>Thống kê</Text>
+        </View>
+
+        <View style={styles.placeholder} />
       </View>
 
       {/* FILTER TABS */}
@@ -166,21 +170,33 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingVertical: 15,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FAFAFA',
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
+    position: 'relative',
   },
   backButton: {
+    padding: 5,
+    zIndex: 10,
+  },
+  headerTitleContainer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
   },
   headerTitle: {
     fontSize: 20,
     fontFamily: 'Baloo2_700Bold',
-    color: '#000000',
+    color: '#1A1A2E',
   },
-  headerRightPlaceholder: {
-    width: 28,
+  placeholder: {
+    width: 44,
   },
   filterContainer: {
     flexDirection: 'row',

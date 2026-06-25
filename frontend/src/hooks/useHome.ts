@@ -31,12 +31,24 @@ export const useHome = () => {
   );
 
   const handleSelectEmotion = useCallback((emotion: Emotion) => {
+    if (!user || user.id === 0 || user.role === 'guest') {
+      Alert.alert(
+        'Dành cho Thành viên',
+        'Tính năng nhật ký giúp cậu theo dõi cảm xúc dài hạn. Vui lòng tạo tài khoản để lưu lại những kỷ niệm này nhé! 🤍'
+      );
+      return;
+    }
     setSelectedEmotion(emotion);
     setModalVisible(true);
-  }, []);
+  }, [user]);
 
   const handleSubmitDiary = useCallback(async (reason: string) => {
     if (!selectedEmotion) return;
+
+    if (!user || user.id === 0 || user.role === 'guest') {
+      Alert.alert('Dành cho Thành viên', 'Vui lòng tạo tài khoản để viết nhật ký nhé! 🤍');
+      return;
+    }
 
     try {
       const response = await diaryApi.addDiary({

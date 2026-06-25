@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import { useAuthStore } from '../../store/auth.store';
 import { useHome } from '../../hooks/useHome';
 import EmotionModal from '../../components/homescreen/EmotionModal';
@@ -23,6 +24,7 @@ const { width } = Dimensions.get('window');
 const mintColor = '#4ABEB2';
 
 export default function HomeScreen() {
+  const navigation = useNavigation<any>();
   const {
     diaries,
     selectedEmotion,
@@ -50,7 +52,10 @@ export default function HomeScreen() {
             <Text style={styles.nameText}>{user?.full_name || 'Khách'}</Text>
           </View>
           <View style={styles.headerRight}>
-            <TouchableOpacity style={styles.bellIcon}>
+            <TouchableOpacity 
+              style={styles.bellIcon} 
+              onPress={() => (navigation as any).navigate('Notification')}
+            >
               <Feather name="bell" size={26} color="#000" />
             </TouchableOpacity>
             <Image
