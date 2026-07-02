@@ -23,4 +23,5 @@ export type AppStackParamList = {
   Statistics: undefined;
   History: undefined;
   Notification: undefined;
+  Relax: undefined;
 };

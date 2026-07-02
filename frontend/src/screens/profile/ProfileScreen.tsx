@@ -24,7 +24,7 @@ const { width } = Dimensions.get('window');
 
 const MOCK_DATA = [
   { id: '1', title: 'Thông tin cá nhân', iconName: 'person', iconType: 'Ionicons' },
-  { id: '2', title: 'Lời khuyên', iconName: 'bandage', iconType: 'MaterialCommunityIcons' },
+  { id: '2', title: 'Thư giãn', iconName: 'leaf', iconType: 'Ionicons' },
   { id: '3', title: 'Biểu đồ cảm xúc', iconName: 'happy-outline', iconType: 'Ionicons' },
   { id: '4', title: 'Đổi mật khẩu', iconName: 'lock-closed', iconType: 'Ionicons' },
   { id: '5', title: 'Lịch sử', iconName: 'time', iconType: 'Ionicons' },
@@ -113,6 +113,8 @@ export default function ProfileScreen() {
                   onPress={() => {
                     if (item.id === '1') {
                       navigation.navigate('PersonalInfo');
+                    } else if (item.id === '2') {
+                      navigation.navigate('Relax');
                     } else if (item.id === '3') {
                       navigation.navigate('Statistics');
                     } else if (item.id === '4') {

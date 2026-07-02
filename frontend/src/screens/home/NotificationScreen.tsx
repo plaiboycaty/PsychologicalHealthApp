@@ -5,10 +5,10 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  SafeAreaView,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface NotificationItem {
   id: string;
@@ -72,9 +72,9 @@ export default function NotificationScreen() {
 
   const renderItem = ({ item }: { item: NotificationItem }) => {
     const iconConfig = getIconConfig(item.type);
-    
+
     return (
-      <TouchableOpacity 
+      <TouchableOpacity
         style={[styles.card, !item.isRead ? styles.cardUnread : styles.cardRead]}
         onPress={() => markAsRead(item.id)}
         activeOpacity={0.7}
@@ -82,7 +82,7 @@ export default function NotificationScreen() {
         <View style={[styles.iconContainer, { backgroundColor: iconConfig.bgColor }]}>
           <Feather name={iconConfig.name as any} size={20} color={iconConfig.color} />
         </View>
-        
+
         <View style={styles.contentContainer}>
           <Text style={styles.title} numberOfLines={1}>{item.title}</Text>
           <Text style={styles.message} numberOfLines={2}>{item.message}</Text>
@@ -107,7 +107,7 @@ export default function NotificationScreen() {
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Feather name="chevron-left" size={28} color="#1A1A2E" />
         </TouchableOpacity>
-        
+
         <View style={styles.headerTitleContainer} pointerEvents="none">
           <Text style={styles.headerTitle}>Thông báo</Text>
         </View>

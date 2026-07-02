@@ -18,6 +18,7 @@ import ResultScreen from '../screens/tests/ResultScreen';
 import StatisticsScreen from '../screens/profile/StatisticsScreen';
 import HistoryScreen from '../screens/profile/HistoryScreen';
 import NotificationScreen from '../screens/home/NotificationScreen';
+import RelaxScreen from '../screens/profile/RelaxScreen';
 
 const Tab = createBottomTabNavigator<AppTabParamList>();
 const Stack = createNativeStackNavigator<AppStackParamList>();
@@ -84,6 +85,7 @@ const AnimatedResult = withTabTransition(ResultScreen);
 const AnimatedStatistics = withTabTransition(StatisticsScreen);
 const AnimatedHistory = withTabTransition(HistoryScreen);
 const AnimatedNotification = withTabTransition(NotificationScreen);
+const AnimatedRelax = withTabTransition(RelaxScreen);
 
 function TabNavigator() {
   return (
@@ -130,6 +132,7 @@ export default function AppNavigator() {
       <Stack.Screen name="Statistics" component={AnimatedStatistics} />
       <Stack.Screen name="History" component={AnimatedHistory} />
       <Stack.Screen name="Notification" component={AnimatedNotification} />
+      <Stack.Screen name="Relax" component={AnimatedRelax} />
     </Stack.Navigator>
   );
 }

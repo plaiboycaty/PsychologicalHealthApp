@@ -9,8 +9,10 @@ import {
   Dimensions,
   Animated,
   TouchableWithoutFeedback,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import TaskRow from './TaskRow';
 import { WeekData } from '../../constants/roadmap-mock';
 
@@ -33,6 +35,7 @@ export default function TaskModal({
   onClose,
   onToggleTask,
 }: TaskModalProps) {
+  const navigation = useNavigation<any>();
   const scaleAnim = useRef(new Animated.Value(0.88)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -75,6 +78,73 @@ export default function TaskModal({
   const totalTasks = week.tasks.length;
   const doneTasks = week.tasks.filter(t => completedTasks.includes(t.taskId)).length;
   const progress = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
+
+  const handleTaskPress = (taskId: string, title: string) => {
+    const isDone = completedTasks.includes(taskId);
+    if (!isDone) {
+      const lowerTitle = title.toLowerCase();
+      if (lowerTitle.includes('thở') || lowerTitle.includes('âm thanh') || lowerTitle.includes('4-7-8') || lowerTitle.includes('nhạc') || lowerTitle.includes('432hz') || lowerTitle.includes('tần số')) {
+        Alert.alert(
+          'Thực hành Nhiệm vụ',
+          'Bạn có muốn đi đến Góc Thư Giãn để nghe nhạc và tập thở không?',
+          [
+            { text: 'Bỏ qua', onPress: () => onToggleTask(week.id, taskId), style: 'cancel' },
+            { 
+              text: 'Đi tới Thư giãn', 
+              onPress: () => {
+                onToggleTask(week.id, taskId);
+                onClose();
+                navigation.navigate('MainTabs', { screen: 'Profile' }); 
+                setTimeout(() => navigation.navigate('Relax'), 100);
+              }
+            }
+          ]
+        );
+        return;
+      }
+
+      if (lowerTitle.includes('nhật ký') || lowerTitle.includes('biết ơn') || lowerTitle.includes('ghi ra')) {
+        Alert.alert(
+          'Thực hành Nhiệm vụ',
+          'Bạn có muốn đi tới chức năng Nhật ký để viết ngay bây giờ không?',
+          [
+            { text: 'Bỏ qua', onPress: () => onToggleTask(week.id, taskId), style: 'cancel' },
+            { 
+              text: 'Viết nhật ký', 
+              onPress: () => {
+                onToggleTask(week.id, taskId);
+                onClose();
+                navigation.navigate('MainTabs', { screen: 'Diaries' });
+              }
+            }
+          ]
+        );
+        return;
+      }
+
+      if (lowerTitle.includes('zung') || lowerTitle.includes('đánh giá')) {
+        Alert.alert(
+          'Thực hành Nhiệm vụ',
+          'Bạn có muốn làm bài đánh giá ngay bây giờ không?',
+          [
+            { text: 'Bỏ qua', onPress: () => onToggleTask(week.id, taskId), style: 'cancel' },
+            { 
+              text: 'Làm bài Test', 
+              onPress: () => {
+                onToggleTask(week.id, taskId);
+                onClose();
+                navigation.navigate('MainTabs', { screen: 'Tests' });
+              }
+            }
+          ]
+        );
+        return;
+      }
+    }
+    
+    // Tích bình thường
+    onToggleTask(week.id, taskId);
+  };
 
   return (
     <Modal
@@ -139,7 +209,7 @@ export default function TaskModal({
                 key={task.taskId}
                 task={task}
                 isCompleted={completedTasks.includes(task.taskId)}
-                onToggle={() => onToggleTask(week.id, task.taskId)}
+                onToggle={() => handleTaskPress(task.taskId, task.taskTitle)}
               />
             ))}
             <View style={{ height: 8 }} />
